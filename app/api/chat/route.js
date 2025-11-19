@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 export async function POST(req) {
   try {
     // 1. HARDCODE YOUR KEY HERE (Keep the quote marks!)
-    const apiKey = AIzaSyAJh0qYuFePySUHYvoOysIIDjZvrmPOml0; 
+    const apiKey = Your_API_KEY; 
 
     // 2. Initialize Google AI
     const genAI = new GoogleGenerativeAI(apiKey);
