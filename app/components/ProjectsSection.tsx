@@ -1,135 +1,137 @@
 "use client";
 import { useEffect, useState } from "react";
-import { motion, Variants, AnimatePresence } from "framer-motion";
-import { Github, ExternalLink } from "lucide-react";
+import { motion, Variants } from "framer-motion";
+import { Github, ArrowUpRight } from "lucide-react";
+import Image from "next/image";
 
 export default function ProjectsSection() {
   const [projects, setProjects] = useState([]);
-  
-  const [hoveredProject, setHoveredProject] = useState<string | null>(null);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const [windowWidth, setWindowWidth] = useState(0);
 
   useEffect(() => {
     fetch("/api/projects")
       .then((res) => res.json())
       .then((data) => setProjects(data))
       .catch((err) => console.error("Failed to load projects", err));
-
-    const handleResize = () => setWindowWidth(window.innerWidth);
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
   }, []);
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    setMousePos({ x: e.clientX, y: e.clientY });
-  };
-
-  // SMART POSITIONING LOGIC - TIGHTER GAP
-  // If mouse is on LEFT side -> Show image 40px to the RIGHT of cursor
-  // If mouse is on RIGHT side -> Show image 440px to the LEFT (400px width + 40px gap)
-  const imageXOffset = mousePos.x < windowWidth / 2 ? 40 : -440;
 
   const containerVariants: Variants = {
     hidden: { opacity: 0 },
-    visible: { 
-      opacity: 1, 
-      transition: { staggerChildren: 0.2 } 
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.15, delayChildren: 0.2 }
     }
   };
 
   const cardVariants: Variants = {
-    hidden: { opacity: 0, y: 50 },
-    visible: { 
-      opacity: 1, 
-      y: 0, 
-      transition: { duration: 0.6, ease: "easeOut" } 
+    hidden: { opacity: 0, y: 30, scale: 0.98 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: { duration: 0.8, ease: [0.2, 0.65, 0.3, 0.9] } // Cinematic easing
     }
   };
 
   return (
-    <section 
-      id="projects" 
-      className="py-20 px-4 relative z-10"
-      onMouseMove={handleMouseMove} 
-    >
-      {/* FLOATING IMAGE PREVIEW */}
-      <AnimatePresence>
-        {hoveredProject && (
-          <motion.img
-            src={hoveredProject}
-            alt="Project Preview"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ 
-              opacity: 1, 
-              scale: 1, 
-              // Dynamic X position: Closer to cursor
-              x: mousePos.x + imageXOffset, 
-              y: mousePos.y - 150, // Center vertically on cursor
-              rotate: mousePos.x < windowWidth / 2 ? 5 : -5 // Tilt inward
-            }}
-            exit={{ opacity: 0, scale: 0.5 }}
-            transition={{ duration: 0.1, ease: "easeOut" }} // Snappy follow
-            className="fixed top-0 left-0 w-[400px] h-[250px] object-cover rounded-xl pointer-events-none z-50 border-2 border-white/20 shadow-2xl bg-black"
-          />
-        )}
-      </AnimatePresence>
+    <section id="projects" className="py-32 px-6 relative z-10 bg-[#DEDEDE]">
+      <div className="max-w-7xl mx-auto">
 
-      <div className="max-w-6xl mx-auto">
-        <motion.h2 
+        {/* Section Header - Refined & Balanced */}
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-4xl font-bold text-center mb-12 text-white"
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.8 }}
+          className="flex flex-col md:flex-row justify-between items-end mb-24 border-b border-black/5 pb-10"
         >
-          Featured Projects
-        </motion.h2>
+          <div className="space-y-4">
+            <span className="text-xs font-bold tracking-[0.2em] text-gray-500 uppercase">
+              // Selected Works
+            </span>
+            <h2 className="text-5xl md:text-7xl font-medium text-black tracking-tight">
+              Curated <span className="text-gray-400 font-light italic">Projects</span>
+            </h2>
+          </div>
+          <p className="text-gray-600 max-w-xs text-right text-sm font-medium leading-relaxed mt-6 md:mt-0">
+            A collection of digital experiences crafted with precision, performance, and passion.
+          </p>
+        </motion.div>
 
-        <motion.div 
-          // FIX: This key forces the animation to restart when projects load
-          key={projects.length} 
-          className="grid grid-cols-1 md:grid-cols-2 gap-8"
+        {/* Projects Grid - Immersive & Cinematic */}
+        <motion.div
+          className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-32"
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, amount: 0.1 }}
+          viewport={{ once: true, margin: "-50px" }}
         >
           {projects.map((project: any) => (
             <motion.div
               key={project.id}
               variants={cardVariants}
-              onMouseEnter={() => setHoveredProject(project.image)}
-              onMouseLeave={() => setHoveredProject(null)}
-              className="glass-card group relative p-6 rounded-2xl transition-all duration-500 hover:-translate-y-2 hover:border-white/30 cursor-none" 
+              className="group flex flex-col gap-8"
             >
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">{project.category}</span>
-                  <h3 className="text-2xl font-bold text-white mt-1 group-hover:text-gray-300 transition-colors">{project.title}</h3>
-                </div>
-                <div className="flex gap-3 z-20 relative">
-                  <a href={project.githubLink} target="_blank" className="text-gray-400 hover:text-white transition-colors p-2 bg-white/5 rounded-full hover:bg-white/10">
-                    <Github size={18} />
+              {/* 1. Cinematic Image Container */}
+              <div className="relative w-full aspect-[16/10] overflow-hidden rounded-2xl bg-gray-200 shadow-sm group-hover:shadow-2xl transition-all duration-700 ease-out">
+                {/* Image with slow parallax-like zoom */}
+                <img
+                  src={project.image || "/placeholder.jpg"}
+                  alt={project.title}
+                  className="w-full h-full object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-105"
+                />
+
+                {/* Soft Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+                {/* Action Buttons - Floating Appearance */}
+                <div className="absolute bottom-6 right-6 flex gap-3 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 delay-100">
+                  <a
+                    href={project.githubLink}
+                    target="_blank"
+                    className="p-3 bg-white/90 backdrop-blur-sm rounded-full text-black hover:bg-black hover:text-white transition-all duration-300 shadow-lg hover:shadow-xl"
+                    title="View Code"
+                  >
+                    <Github size={18} strokeWidth={2} />
                   </a>
                   {project.liveLink && project.liveLink !== "#" && (
-                     <a href={project.liveLink} target="_blank" className="text-gray-400 hover:text-white transition-colors p-2 bg-white/5 rounded-full hover:bg-white/10">
-                     <ExternalLink size={18} />
-                   </a>
+                    <a
+                      href={project.liveLink}
+                      target="_blank"
+                      className="p-3 bg-white/90 backdrop-blur-sm rounded-full text-black hover:bg-[#00C853] hover:text-white transition-all duration-300 shadow-lg hover:shadow-xl"
+                      title="Live Demo"
+                    >
+                      <ArrowUpRight size={18} strokeWidth={2} />
+                    </a>
                   )}
                 </div>
               </div>
 
-              <p className="text-gray-400 mb-6 leading-relaxed text-sm">
-                {project.description}
-              </p>
-
-              <div className="flex flex-wrap gap-2">
-                {project.techStack.map((tech: string) => (
-                  <span key={tech} className="px-3 py-1 text-xs font-medium bg-white/5 text-gray-300 border border-white/10 rounded-full">
-                    {tech}
+              {/* 2. Project Details - Clean & Sophisticated */}
+              <div className="space-y-4 px-2">
+                <div className="flex justify-between items-baseline border-b border-black/5 pb-4">
+                  <h3 className="text-3xl font-medium text-black tracking-tight group-hover:text-[#00C853] transition-colors duration-300">
+                    {project.title}
+                  </h3>
+                  <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+                    {project.category}
                   </span>
-                ))}
+                </div>
+
+                <p className="text-gray-600 text-base leading-relaxed line-clamp-2 font-light">
+                  {project.description}
+                </p>
+
+                {/* Refined Tags - Monochrome Pills */}
+                <div className="flex flex-wrap gap-2 pt-2">
+                  {project.techStack.map((tech: string) => (
+                    <span
+                      key={tech}
+                      className="px-3 py-1 text-[11px] font-semibold text-gray-500 bg-gray-100 rounded-full uppercase tracking-wide hover:bg-black hover:text-white transition-colors duration-300"
+                    >
+                      {tech}
+                    </span>
+                  ))}
+                </div>
               </div>
             </motion.div>
           ))}

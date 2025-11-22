@@ -1,24 +1,29 @@
 @import "tailwindcss";
 
 :root {
-  /* ECHELON PALETTE: Tactical Luxury */
-  --bg-dark: #050505;       /* True Deep Black */
-  --bg-card: #0a0a0a;       /* Graphite Black */
-  --border-color: #262626;  /* Subtle Gray Border */
-  --text-main: #ededed;     /* Off-White (easier on eyes) */
-  --text-muted: #888888;    /* Muted Gray for details */
-  --accent: #ffffff;        /* Stark White Accent */
+  /* MANTIS LIGHT STEALTH PALETTE */
+  --bg-dark: #DEDEDE;       /* Light Gray Base */
+  --bg-card: #EAEAEA;       /* Slightly lighter card */
+  --border-color: #B0B0B0;  /* Defined borders */
+  --text-main: #050505;     /* Deep Black Text */
+  --text-muted: #666666;    /* Muted Gray Text */
+  --accent: #000000;        /* PURE BLACK ACCENT (Stealth) */
+  --accent-dim: #333333;    /* Dark Gray */
 }
+html {
+  scroll-behavior: smooth;
+}
+
 
 body {
   color: var(--text-main);
   background-color: var(--bg-dark);
   font-family: 'Inter', sans-serif; 
   overflow-x: hidden;
-  cursor: none; /* Keep custom cursor */
+  cursor: none; 
 }
 
-/* Echelon-style Grid Background */
+/* Subtle Grid Background */
 body::before {
   content: "";
   position: fixed;
@@ -27,15 +32,14 @@ body::before {
   width: 100%;
   height: 100%;
   background-image: 
-    linear-gradient(to right, #1a1a1a 1px, transparent 1px),
-    linear-gradient(to bottom, #1a1a1a 1px, transparent 1px);
-  background-size: 100px 100px; /* Large, subtle grid */
-  opacity: 0.15;
+    linear-gradient(to right, #CCCCCC 1px, transparent 1px),
+    linear-gradient(to bottom, #CCCCCC 1px, transparent 1px);
+  background-size: 40px 40px;
+  opacity: 0.3;
   pointer-events: none;
   z-index: -1;
 }
 
-/* Custom Scrollbar - Thin & Stealthy */
 ::-webkit-scrollbar {
   width: 4px;
 }
@@ -43,25 +47,25 @@ body::before {
   background: var(--bg-dark); 
 }
 ::-webkit-scrollbar-thumb {
-  background: #333; 
+  background: var(--accent); 
   border-radius: 2px;
 }
 
-/* Echelon Glass Card (Flatter, Sharper) */
 .glass-card {
-  background: rgba(10, 10, 10, 0.6);
-  backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(12px);
   border: 1px solid var(--border-color);
-  transition: all 0.4s ease;
+  transition: all 0.3s ease;
+  color: #000;
 }
 .glass-card:hover {
   border-color: var(--accent);
-  background: rgba(20, 20, 20, 0.8);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
 }
 
-/* Text Gradient (Subtle Metallic) */
 .text-gradient {
-  background: linear-gradient(to bottom, #ffffff, #999999);
+  background: linear-gradient(to bottom, #000000, #444444);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }

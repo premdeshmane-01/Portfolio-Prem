@@ -8,26 +8,44 @@ import VideoIntro from "./components/VideoIntro";
 import Navbar from "./components/Navbar"; 
 import CustomCursor from "./components/CustomCursor";
 import Preloader from "./components/Preloader";
+import Footer from "./components/Footer"; 
 
 export default function Home() {
   return (
-    // UPDATED: Removed 'bg-[#050505]' so the 3D background is visible
-    <main className="min-h-screen relative text-white selection:bg-white selection:text-black overflow-hidden">
+    <main className="min-h-screen relative text-black selection:bg-[#00C853] selection:text-white overflow-x-hidden">
       <Preloader />
       <CustomCursor />
       <Navbar />
       
-      {/* The 3D Stars live here, fixed in the background */}
-      <Background3D />
+      {/* GLOBAL BACKGROUND - Fixed behind everything */}
+      <div className="fixed inset-0 z-[-1]">
+        <Background3D />
+      </div>
       
-      {/* Content sits on top with z-10 */}
-      <div className="relative z-10">
-        <Hero />
-        <About />
-        <Skills />
-        <ProjectsSection />
-        <VideoIntro />
-        <ChatWidget />
+      {/* HERO (fixed + animated inside Hero.tsx) */}
+      <Hero />
+      
+      {/* MAIN CONTENT – starts after first viewport height */}
+      <div className="relative z-10 mt-[100vh]">
+        <div className="bg-[#DEDEDE] shadow-2xl relative min-h-screen border-t border-[#DEDEDE]">
+          <About />
+          <Skills />
+          <ProjectsSection />
+
+          {/* Small spacer for breathing room before next sections */}
+          <div className="h-12 md:h-16" />
+
+          <VideoIntro />
+          <ChatWidget />
+
+          {/* Bottom text inside content */}
+          <div className="h-16 flex items-center justify-center text-gray-400 text-sm uppercase tracking-widest bg-[#DEDEDE]">
+            © 2025 Premsagar Deshmane
+          </div>
+
+          {/* Footer at the very bottom (normal flow) */}
+          <Footer />
+        </div>
       </div>
     </main>
   );

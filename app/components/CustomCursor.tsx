@@ -10,7 +10,6 @@ export default function CustomCursor() {
     const updateMousePosition = (e: MouseEvent) => {
       setMousePosition({ x: e.clientX, y: e.clientY });
       
-      // Check if hovering over clickable elements (buttons or links)
       const target = e.target as HTMLElement;
       if (target.tagName === "BUTTON" || target.tagName === "A" || target.closest("button") || target.closest("a")) {
         setIsHovering(true);
@@ -25,25 +24,25 @@ export default function CustomCursor() {
 
   return (
     <>
-      {/* Main Dot (Sharp White) */}
+      {/* Main Dot (Black for Light Mode) */}
       <motion.div
-        className="fixed top-0 left-0 w-2 h-2 bg-white rounded-full pointer-events-none z-[9999] mix-blend-difference"
+        className="fixed top-0 left-0 w-2 h-2 bg-black rounded-full pointer-events-none z-[9999]"
         animate={{
           x: mousePosition.x - 4,
           y: mousePosition.y - 4,
-          opacity: isHovering ? 0 : 1, // Hide dot when hovering
+          opacity: isHovering ? 0 : 1, 
         }}
         transition={{ duration: 0 }}
       />
       
-      {/* Trailing Ring (Gray -> White on Hover) */}
+      {/* Trailing Ring (Dark Gray) */}
       <motion.div
-        className="fixed top-0 left-0 w-8 h-8 border border-gray-500 rounded-full pointer-events-none z-[9998]"
+        className="fixed top-0 left-0 w-8 h-8 border border-gray-800 rounded-full pointer-events-none z-[9998]"
         animate={{
           x: mousePosition.x - 16,
           y: mousePosition.y - 16,
-          scale: isHovering ? 2.5 : 1, // Expand when hovering
-          borderColor: isHovering ? "#ffffff" : "#666666", // Gray normally, White on hover
+          scale: isHovering ? 2.5 : 1, 
+          borderColor: isHovering ? "#000000" : "#333333", 
           borderWidth: isHovering ? "2px" : "1px",
         }}
         transition={{ type: "spring", stiffness: 150, damping: 15 }}

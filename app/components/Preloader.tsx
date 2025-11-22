@@ -2,68 +2,88 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
+const bootSequence = [
+  "INITIALIZING SYSTEM...",
+  "LOADING ASSETS...",
+  "CONNECTING TO NEURAL NET...",
+  "CALIBRATING 3D ENGINE...",
+  "ACCESS GRANTED."
+];
+
 export default function Preloader() {
-  const [count, setCount] = useState(0);
+  const [textIndex, setTextIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [showFinalText, setShowFinalText] = useState(false);
 
   useEffect(() => {
-    // Counter Animation
     const interval = setInterval(() => {
-      setCount((prev) => {
-        if (prev >= 100) {
+      setTextIndex((prev) => {
+        if (prev >= bootSequence.length - 1) {
           clearInterval(interval);
-          setTimeout(() => setIsLoading(false), 800); // Slight pause at 100% for impact
-          return 100;
+          // After boot sequence finishes, show the final message
+          setShowFinalText(true);
+          
+          // Wait 2 seconds on the final message, then hide loader
+          setTimeout(() => setIsLoading(false), 2000); 
+          return prev;
         }
-        // Smaller, smoother increments
-        const jump = Math.floor(Math.random() * 5) + 1; 
-        return Math.min(prev + jump, 100);
+        return prev + 1;
       });
-    }, 50); // Faster interval for fluidity
+    }, 300); // Speed of each line appearing
 
     return () => clearInterval(interval);
   }, []);
-
-  // Dynamic Color Logic: Shifts from Dark Gray (#444) to Pure White (#FFF)
-  // Formula: 68 is roughly #444444, we add up to 255
-  const colorValue = Math.floor(68 + (count / 100) * 187);
-  const dynamicColor = `rgb(${colorValue}, ${colorValue}, ${colorValue})`;
 
   return (
     <AnimatePresence mode="wait">
       {isLoading && (
         <motion.div
-          className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#050505] cursor-none"
+          className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-black cursor-none"
           exit={{ 
-            y: "-100%", 
-            transition: { duration: 0.8, ease: [0.76, 0, 0.24, 1] } 
+            opacity: 0, 
+            transition: { duration: 0.8, ease: "easeInOut" } 
           }} 
         >
-          <div className="flex flex-col items-center gap-4">
-            
-            {/* 1. Minimalist Percentage Counter */}
-            <motion.span 
-              className="text-4xl font-mono font-light tracking-widest"
-              animate={{ color: dynamicColor }} // Color shifts dynamically
-            >
-              {count}%
-            </motion.span>
+          {!showFinalText ? (
+            <div className="w-80 font-mono text-sm">
+              {/* Progress Bar */}
+              <div className="w-full h-[2px] bg-gray-900 mb-4 overflow-hidden relative">
+                <motion.div 
+                  className="h-full absolute top-0 left-0 bg-green-500 shadow-[0_0_10px_#00ff00]"
+                  initial={{ width: "0%" }}
+                  animate={{ width: "100%" }}
+                  transition={{ duration: 2, ease: "linear" }}
+                />
+              </div>
 
-            {/* 2. Dynamic Progress Bar */}
-            <div className="w-48 h-[2px] bg-gray-900 rounded-full overflow-hidden relative">
-              <motion.div 
-                className="h-full absolute top-0 left-0"
-                style={{ width: `${count}%` }}
-                animate={{ backgroundColor: dynamicColor, boxShadow: `0 0 10px ${dynamicColor}` }}
-                transition={{ ease: "linear", duration: 0.1 }}
-              />
+              {/* Terminal Lines */}
+              <div className="flex flex-col gap-1 h-32">
+                {bootSequence.slice(0, textIndex + 1).map((text, idx) => (
+                  <motion.p 
+                    key={idx}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className={`tracking-widest ${
+                      idx === bootSequence.length - 1 ? "text-green-400 font-bold" : "text-gray-500"
+                    }`}
+                  >
+                    {`> ${text}`}
+                  </motion.p>
+                ))}
+              </div>
             </div>
-
-            {/* 3. Tiny Status Text */}
-            <p className="text-[10px] uppercase tracking-[0.3em] text-gray-600 mt-2">
-              System Initializing
-            </p>
-          </div>
+          ) : (
+            /* Final Message */
+            <motion.h1
+              initial={{ opacity: 0, scale: 0.9, filter: "blur(10px)" }}
+              animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+              exit={{ opacity: 0, scale: 1.1, filter: "blur(10px)" }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+              className="text-4xl md:text-6xl font-bold text-white tracking-tighter text-center"
+            >
+              Let's Build <span className="text-gray-500">Experiences.</span>
+            </motion.h1>
+          )}
         </motion.div>
       )}
     </AnimatePresence>
