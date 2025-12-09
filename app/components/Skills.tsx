@@ -25,7 +25,18 @@ const skills = [
   },
 ];
 
-function SkillCard({ skillGroup, index }) {
+type SkillGroupType = {
+  category: string;
+  items: string[];
+  icon: string;
+};
+
+interface SkillCardProps {
+  skillGroup: SkillGroupType;
+  index: number;
+}
+
+function SkillCard({ skillGroup, index }: SkillCardProps) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
