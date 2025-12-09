@@ -1,12 +1,12 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, type Transition } from "framer-motion";
 import Reveal from "./Reveal";
 
-const floatTransition = {
+const floatTransition: Transition = {
   duration: 4,
   repeat: Infinity,
-  repeatType: "reverse" as const,
+  repeatType: "reverse",
   ease: "easeInOut",
 };
 
