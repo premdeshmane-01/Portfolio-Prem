@@ -1,94 +1,162 @@
 "use client";
-import { motion, Variants } from "framer-motion";
-import Reveal from "./Reveal"; 
+import { motion, useInView } from "framer-motion";
+import { useRef } from "react";
 
 const skills = [
-  { category: "Frontend Engineering", items: ["React", "Next.js", "Tailwind CSS", "GSAP", "Three.js", "Framer Motion"] },
-  { category: "Backend Architecture", items: ["Node.js", "Express", "MongoDB", "PostgreSQL", "Firebase", "REST APIs"] },
-  { category: "AI & Machine Learning", items: ["Python", "TensorFlow", "OpenAI API", "LangChain", "RAG Pipelines", "Prompt Engineering"] },
-  { category: "DevOps & Tools", items: ["Git/GitHub", "Docker", "Figma", "Vercel", "Postman", "Linux"] },
+  { 
+    category: "Frontend Engineering", 
+    items: ["React", "Next.js", "Tailwind CSS", "GSAP", "Three.js"],
+    icon: "⚡"
+  },
+  { 
+    category: "Backend Architecture", 
+    items: ["Node.js", "Express", "MongoDB", "PostgreSQL"],
+    icon: "⚙️"
+  },
+  { 
+    category: "AI & Machine Learning", 
+    items: ["Python", "TensorFlow", "OpenAI API", "RAG Pipelines"],
+    icon: "🧠"
+  },
+  { 
+    category: "DevOps & Tools", 
+    items: ["Git/GitHub", "Figma", "Docker", "Vercel"],
+    icon: "🛠️"
+  },
 ];
 
-const containerVariants: Variants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-      delayChildren: 0.2
-    }
-  }
-};
+function SkillCard({ skillGroup, index }) {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-100px" });
 
-const cardVariants: Variants = {
-  hidden: { opacity: 0, y: 20 }, 
-  visible: { 
-    opacity: 1, 
-    y: 0, 
-    transition: { duration: 0.5, ease: "easeOut" } 
-  }
-};
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 60 }}
+      animate={isInView ? { opacity: 1, y: 0 } : {}}
+      transition={{ 
+        duration: 0.8, 
+        delay: index * 0.15,
+        ease: [0.22, 1, 0.36, 1]
+      }}
+      whileHover={{ y: -8, scale: 1.02 }}
+      className="group relative overflow-hidden bg-white/60 backdrop-blur-sm p-8 rounded-3xl border border-black/10 hover:border-black/20 transition-all duration-500 shadow-sm hover:shadow-xl"
+    >
+      {/* Gradient overlay on hover */}
+      <div className="absolute inset-0 bg-gradient-to-br from-black/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      
+      {/* Subtle corner accent */}
+      <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-black/[0.02] to-transparent rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+      {/* Category header */}
+      <div className="relative z-10 mb-8 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <motion.div
+            initial={{ scale: 0, rotate: -180 }}
+            animate={isInView ? { scale: 1, rotate: 0 } : {}}
+            transition={{ delay: index * 0.15 + 0.3, type: "spring", stiffness: 200 }}
+            className="text-3xl"
+          >
+            {skillGroup.icon}
+          </motion.div>
+          <h3 className="text-base font-bold text-black uppercase tracking-[0.15em]">
+            {skillGroup.category}
+          </h3>
+        </div>
+        
+        {/* Index number */}
+        <span className="text-6xl font-black text-black/[0.04] group-hover:text-black/[0.08] transition-colors">
+          0{index + 1}
+        </span>
+      </div>
+
+      {/* Skills tags */}
+      <div className="relative z-10 flex flex-wrap gap-2.5">
+        {skillGroup.items.map((item, i) => (
+          <motion.span
+            key={i}
+            initial={{ opacity: 0, scale: 0 }}
+            animate={isInView ? { opacity: 1, scale: 1 } : {}}
+            transition={{ 
+              delay: index * 0.15 + 0.4 + i * 0.05,
+              type: "spring",
+              stiffness: 300
+            }}
+            whileHover={{ 
+              scale: 1.1,
+              backgroundColor: "rgba(0, 0, 0, 0.95)",
+              color: "#ffffff",
+            }}
+            className="cursor-default px-4 py-2 bg-white/50 border border-black/10 rounded-full text-sm font-medium text-black/80 hover:border-black transition-all duration-300"
+          >
+            {item}
+          </motion.span>
+        ))}
+      </div>
+    </motion.div>
+  );
+}
 
 export default function Skills() {
+  const headerRef = useRef(null);
+  const isHeaderInView = useInView(headerRef, { once: true });
+
   return (
-    <section className="py-32 px-6 relative z-10 bg-[#DEDEDE]">
-      <div className="max-w-6xl mx-auto">
+    <section className="relative z-10 overflow-hidden bg-[#DEDEDE] py-32 px-6 md:px-12">
+      {/* Background elements */}
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute top-1/4 left-1/4 h-[500px] w-[500px] rounded-full bg-black/[0.02] blur-[150px]" />
+        <div className="absolute bottom-1/4 right-1/3 h-[400px] w-[400px] rounded-full bg-black/[0.02] blur-[120px]" />
+      </div>
+
+      <div className="relative max-w-7xl mx-auto">
         
-        {/* Section Header - Minimal & Centered */}
-        <div className="text-center mb-24">
-          <Reveal width="100%">
-            <span className="text-xs font-bold tracking-[0.3em] text-gray-500 uppercase block mb-3">
-              Capabilities
+        {/* Section Header */}
+        <div ref={headerRef} className="mb-20">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={isHeaderInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.8 }}
+            className="flex items-center gap-4 mb-8"
+          >
+            <div className="h-px w-16 bg-gradient-to-r from-transparent to-black/20" />
+            <span className="text-xs font-medium uppercase tracking-[0.3em] text-black/50">
+              Technical Arsenal
             </span>
-          </Reveal>
-          <Reveal width="100%" delay={0.1}>
-            <h2 className="text-4xl md:text-6xl font-medium text-black tracking-tight">
-              Technical <span className="text-gray-400 italic font-light">Arsenal</span>
+            <div className="h-px flex-1 bg-gradient-to-r from-black/20 to-transparent" />
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            animate={isHeaderInView ? { opacity: 1, x: 0 } : {}}
+            transition={{ duration: 0.8, delay: 0.2 }}
+          >
+            <h2 className="text-5xl md:text-7xl font-black text-black tracking-tight mb-4">
+              CORE{" "}
+              <span className="text-black/30">COMPETENCIES</span>
             </h2>
-          </Reveal>
+            <p className="text-lg text-black/60 max-w-2xl">
+              A comprehensive toolkit spanning frontend, backend, AI, and DevOps—engineered for building scalable, intelligent systems.
+            </p>
+          </motion.div>
         </div>
 
         {/* Skills Grid */}
-        <motion.div 
-          className="grid grid-cols-1 md:grid-cols-2 gap-8"
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-50px" }}
-        >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
           {skills.map((skillGroup, index) => (
-            <motion.div
-              key={index}
-              variants={cardVariants}
-              className="group relative bg-white/40 backdrop-blur-sm rounded-2xl p-8 border border-white/50 shadow-sm hover:shadow-lg hover:bg-white/60 transition-all duration-500"
-            >
-              {/* Category Header */}
-              <div className="flex items-center gap-4 mb-8">
-                <div className="h-[1px] w-8 bg-black/20 group-hover:w-12 group-hover:bg-black/40 transition-all duration-500"></div>
-                <h3 className="text-sm font-bold text-black uppercase tracking-widest">
-                  {skillGroup.category}
-                </h3>
-              </div>
-              
-              {/* Skill Tags */}
-              <div className="flex flex-wrap gap-3">
-                {skillGroup.items.map((item, i) => (
-                  <motion.span 
-                    key={item} 
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: index * 0.1 + i * 0.05 }}
-                    whileHover={{ scale: 1.05, y: -2 }}
-                    className="cursor-default px-4 py-2 text-xs font-medium text-gray-600 bg-white border border-gray-200 rounded-full 
-                    hover:bg-black hover:text-white hover:border-black transition-all duration-300 shadow-sm"
-                  >
-                    {item}
-                  </motion.span>
-                ))}
-              </div>
-            </motion.div>
+            <SkillCard key={index} skillGroup={skillGroup} index={index} />
           ))}
-        </motion.div>
+        </div>
+
+        {/* Bottom accent */}
+        <motion.div
+          initial={{ scaleX: 0 }}
+          whileInView={{ scaleX: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 1.5, delay: 0.5 }}
+          className="mt-20 h-[1px] w-full bg-gradient-to-r from-transparent via-black/20 to-transparent origin-center"
+        />
+
       </div>
     </section>
   );

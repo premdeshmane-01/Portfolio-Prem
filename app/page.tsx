@@ -1,7 +1,7 @@
 import Hero from "./components/Hero";
 import ProjectsSection from "./components/ProjectsSection";
-import ChatWidget from "./components/ChatWidget";
-import Background3D from "./components/Background3D"; 
+
+// import Background3D from "./components/Background3D"; 
 import Skills from "./components/Skills"; 
 import About from "./components/About"; 
 import VideoIntro from "./components/VideoIntro";
@@ -18,10 +18,10 @@ export default function Home() {
       <Navbar />
       
       {/* GLOBAL BACKGROUND - Fixed behind everything */}
-      <div className="fixed inset-0 z-[-1]">
+      {/* <div className="fixed inset-0 z-[-1]">
         <Background3D />
       </div>
-      
+       */}
       {/* HERO (fixed + animated inside Hero.tsx) */}
       <Hero />
       
@@ -36,7 +36,7 @@ export default function Home() {
           <div className="h-12 md:h-16" />
 
           <VideoIntro />
-          <ChatWidget />
+         
 
           {/* Bottom text inside content */}
           <div className="h-16 flex items-center justify-center text-gray-400 text-sm uppercase tracking-widest bg-[#DEDEDE]">

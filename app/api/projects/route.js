@@ -9,7 +9,7 @@ export async function GET() {
       techStack: ["Locomotive Scroll", "GSAP", "HTML/CSS"],
       description: "Immersive website featuring complex GSAP animations. I improved interaction accuracy by 15% using advanced scroll effects.",
       githubLink: "https://github.com/premdeshmane-01/HomeDown_Animate", 
-      liveLink: "#",
+      liveLink: "https://premdeshmane-01.github.io/HomeDown_Animate/",
       image: "/projects/sundown.png" // UPDATED to .png
     },
     {
@@ -29,7 +29,7 @@ export async function GET() {
       techStack: ["GSAP", "Canvas", "Swiper.js"],
       description: "Pixel-perfect clone of a design agency site. Focused on responsiveness and smooth scroll-triggered animations.",
       githubLink: "https://github.com/premdeshmane-01/LAZAREV_WEB",
-      liveLink: "#",
+      liveLink: "https://premdeshmane-01.github.io/LAZAREV_WEB/",
       image: "/projects/lazarev.png" // UPDATED to .png
     },
     {
@@ -39,7 +39,7 @@ export async function GET() {
       techStack: ["GSAP", "ScrollTrigger", "JS"],
       description: "Mobile-first promotional website with custom cursor interactions and video loops for high user engagement.",
       githubLink: "https://github.com/premdeshmane-01/SideCup_Family_Golf",
-      liveLink: "#",
+      liveLink: "https://premdeshmane-01.github.io/SideCup_Family_Golf/",
       image: "/projects/sidcup.png" // UPDATED to .png
     }
   ];
