@@ -1,5 +1,5 @@
 import Hero from "./components/Hero";
-import ProjectsSection from "./components/ProjectsSection";
+
 
 // import Background3D from "./components/Background3D"; 
 import Skills from "./components/Skills"; 
@@ -9,6 +9,7 @@ import Navbar from "./components/Navbar";
 import CustomCursor from "./components/CustomCursor";
 import Preloader from "./components/Preloader";
 import Footer from "./components/Footer"; 
+import ProjectsSection from "./components/ProjectsSection";
 
 export default function Home() {
   return (

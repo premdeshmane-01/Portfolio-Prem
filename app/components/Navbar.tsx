@@ -1,39 +1,71 @@
 "use client";
+
 import { motion, useScroll, useTransform } from "framer-motion";
-import { useState, useEffect, type MouseEvent } from "react";
+import React, { useEffect, useState, type MouseEvent } from "react";
+
+/**
+ * Responsive Navbar (updated)
+ * - Small screens: pill aligns to the right and shows ONLY the hamburger icon (no "PREM" text)
+ * - Large screens: full centered pill with links & resume CTA (unchanged)
+ * - Hamburger retains slide-over functionality and accessibility features
+ */
 
 export default function Navbar() {
   const { scrollY } = useScroll();
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [isTouch, setIsTouch] = useState(false);
+  const [isSmall, setIsSmall] = useState<boolean>(() =>
+    typeof window !== "undefined" ? window.innerWidth < 1024 : false
+  );
 
-  const navOpacity = useTransform(scrollY, [0, 50], [0.85, 1]);
-  const navScale = useTransform(scrollY, [0, 100], [1, 0.98]);
-  const navY = useTransform(scrollY, [0, 100], [0, -2]);
+  const navOpacity = useTransform(scrollY, [0, 50], [0.95, 1]);
+  const navScale = useTransform(scrollY, [0, 100], [1, 0.995]);
+  const navY = useTransform(scrollY, [0, 100], [0, -1]);
 
   useEffect(() => {
     const updateScroll = () => {
       setIsScrolled(window.scrollY > 50);
 
-      const sections = ["home", "about", "projects"];
-      for (const section of sections) {
-        const element = document.getElementById(section === "home" ? "" : section);
-        if (element) {
-          const rect = element.getBoundingClientRect();
-          if (rect.top <= 100 && rect.bottom >= 100) {
-            setActiveSection(section);
+      const sections = [
+        { id: "home", selector: "header, #home" },
+        { id: "about", selector: "#about" },
+        { id: "projects", selector: "#projects" },
+      ];
+
+      for (const s of sections) {
+        const el = document.querySelector(s.selector) as HTMLElement | null;
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          if (rect.top <= 120 && rect.bottom >= 120) {
+            setActiveSection(s.id);
             break;
           }
         }
       }
     };
 
-    window.addEventListener("scroll", updateScroll);
-    return () => window.removeEventListener("scroll", updateScroll);
+    const onResize = () => setIsSmall(window.innerWidth < 1024);
+    updateScroll();
+    onResize();
+
+    window.addEventListener("scroll", updateScroll, { passive: true });
+    window.addEventListener("resize", onResize);
+    return () => {
+      window.removeEventListener("scroll", updateScroll);
+      window.removeEventListener("resize", onResize);
+    };
+  }, []);
+
+  useEffect(() => {
+    const touch = typeof window !== "undefined" && ("ontouchstart" in window || navigator.maxTouchPoints > 0);
+    setIsTouch(Boolean(touch));
   }, []);
 
   const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
+    if (isTouch || isSmall) return;
     const rect = e.currentTarget.getBoundingClientRect();
     setMousePosition({
       x: e.clientX - rect.left,
@@ -47,255 +79,179 @@ export default function Navbar() {
     { name: "Projects", href: "#projects", id: "projects" },
   ];
 
+  const toggleMenu = (e?: React.KeyboardEvent | React.MouseEvent) => {
+    if (!e) return setMenuOpen((v) => !v);
+    if ("key" in (e as any)) {
+      const ke = e as React.KeyboardEvent;
+      if (ke.key === "Enter" || ke.key === " ") {
+        ke.preventDefault();
+        setMenuOpen((v) => !v);
+      }
+    } else {
+      setMenuOpen((v) => !v);
+    }
+  };
+
   return (
-    <motion.nav
-      initial={{ y: -50, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ delay: 0.8, duration: 1, ease: [0.22, 1, 0.36, 1] }}
-      className="fixed top-6 left-0 w-full z-50 flex justify-center pointer-events-none px-6"
-    >
-      <motion.div
-        style={{
-          opacity: navOpacity,
-          scale: navScale,
-          y: navY,
-        }}
-        onMouseMove={handleMouseMove}
-        className={`pointer-events-auto relative px-4 py-3 rounded-full bg-white/80 backdrop-blur-3xl border border-white/50 shadow-[0_8px_32px_rgba(0,0,0,0.08)] flex items-center gap-2 transition-all duration-700 overflow-hidden ${
-          isScrolled ? "shadow-[0_8px_40px_rgba(0,0,0,0.15)] bg-white/95 border-white/70" : ""
-        }`}
+    <>
+      <motion.nav
+        initial={{ y: -32, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.6, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        className="fixed inset-x-0 top-6 z-50 flex justify-end lg:justify-center px-4 pointer-events-none"
+        aria-label="Primary navigation"
       >
-        {/* Animated gradient mesh background */}
-        <div className="absolute inset-0 rounded-full opacity-50">
-          <motion.div
-            className="absolute inset-0 rounded-full bg-gradient-to-br from-blue-100/40 via-purple-100/40 to-pink-100/40"
-            animate={{
-              background: [
-                "radial-gradient(circle at 20% 50%, rgba(219, 234, 254, 0.4) 0%, transparent 50%)",
-                "radial-gradient(circle at 80% 50%, rgba(243, 232, 255, 0.4) 0%, transparent 50%)",
-                "radial-gradient(circle at 50% 80%, rgba(252, 231, 243, 0.4) 0%, transparent 50%)",
-                "radial-gradient(circle at 20% 50%, rgba(219, 234, 254, 0.4) 0%, transparent 50%)",
-              ],
-            }}
-            transition={{
-              duration: 8,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          />
+        <motion.div
+          style={{
+            opacity: navOpacity,
+            scale: navScale,
+            y: navY,
+          }}
+          onMouseMove={handleMouseMove}
+          className={`pointer-events-auto relative flex items-center gap-2 transition-all duration-700 overflow-hidden
+            ${isSmall ? "px-2 py-2 min-w-[auto] rounded-lg bg-white/90 border border-white/10 shadow-md" : "px-4 py-3 rounded-full bg-white/80 border border-white/40 backdrop-blur-3xl shadow-[0_8px_32px_rgba(0,0,0,0.08)]"}
+            ${isScrolled ? "shadow-[0_8px_40px_rgba(0,0,0,0.15)] bg-white/95 border-white/70" : ""}`}
+        >
+          {/* Desktop centered links (visible on lg and up) */}
+          <div className="hidden lg:flex items-center gap-2">
+            {!isSmall && !isTouch && (
+              <div className="absolute inset-0 rounded-full opacity-40 pointer-events-none -z-10">
+                <motion.div
+                  className="absolute inset-0 rounded-full"
+                  animate={{
+                    background: [
+                      "radial-gradient(circle at 20% 50%, rgba(219, 234, 254, 0.35) 0%, transparent 40%)",
+                      "radial-gradient(circle at 80% 50%, rgba(243, 232, 255, 0.35) 0%, transparent 40%)",
+                      "radial-gradient(circle at 50% 80%, rgba(252, 231, 243, 0.35) 0%, transparent 40%)",
+                    ],
+                  }}
+                  transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+                />
+              </div>
+            )}
+
+            {navItems.map((item) => {
+              const isActive = activeSection === item.id;
+              return (
+                <a
+                  key={item.id}
+                  href={item.href}
+                  className={`relative z-10 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-400
+                    ${isActive ? "text-gray-900" : "text-gray-600 hover:text-gray-900"}
+                  `}
+                  aria-current={isActive ? "page" : undefined}
+                >
+                  <span className="relative z-10">{item.name}</span>
+
+                  {isActive && (
+                    <span aria-hidden className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-1 rounded-full bg-gray-900" />
+                  )}
+                </a>
+              );
+            })}
+
+            <div className="relative w-px h-6 mx-2 overflow-hidden -z-0">
+              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-gray-400/40 to-transparent" />
+            </div>
+
+            <a
+              href="/resume.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="relative z-10 px-4 py-2 rounded-full bg-black text-white text-sm font-semibold flex items-center gap-2 hover:scale-[1.02] transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-400"
+            >
+              <span>Resume</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="inline-block">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+            </a>
+          </div>
+
+          {/* Small screens: only hamburger (no "PREM" text, no compact resume) */}
+          <div className="flex items-center lg:hidden">
+            <button
+              onClick={() => setMenuOpen((v) => !v)}
+              onKeyDown={(e) => toggleMenu(e)}
+              aria-expanded={menuOpen}
+              aria-controls="mobile-nav"
+              aria-label={menuOpen ? "Close menu" : "Open menu"}
+              className="z-10 inline-flex items-center justify-center p-2 rounded-md bg-white/90 border border-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400"
+            >
+              <svg className="w-5 h-5 text-gray-800" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                {menuOpen ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 8h16M4 16h16" />
+                )}
+              </svg>
+            </button>
+          </div>
+        </motion.div>
+      </motion.nav>
+
+      {/* Mobile slide-over menu */}
+      <motion.div
+        id="mobile-nav"
+        role="dialog"
+        aria-modal="true"
+        initial={{ x: "100%" }}
+        animate={{ x: menuOpen ? 0 : "100%" }}
+        transition={{ type: "spring", stiffness: 280, damping: 30 }}
+        className={`fixed top-0 right-0 h-full w-full max-w-xs bg-white/97 shadow-xl z-50 lg:hidden`}
+        style={{ pointerEvents: menuOpen ? "auto" : "none" }}
+      >
+        <div className="flex items-center justify-between px-4 py-4 border-b border-gray-200">
+          <div className="text-lg font-semibold">Menu</div>
+          <button
+            onClick={() => setMenuOpen(false)}
+            aria-label="Close menu"
+            className="p-2 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400"
+          >
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
 
-        {/* Spotlight effect following cursor */}
-        <motion.div
-          className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-          style={{
-            background: `radial-gradient(circle 120px at ${mousePosition.x}px ${mousePosition.y}px, rgba(147, 197, 253, 0.15), transparent 70%)`,
-          }}
-        />
+        <nav className="p-4">
+          <ul className="space-y-2">
+            {navItems.map((item) => (
+              <li key={item.id}>
+                <a
+                  href={item.href}
+                  className={`block px-4 py-3 rounded-md text-base font-medium ${activeSection === item.id ? "bg-indigo-50 text-indigo-700" : "text-gray-700 hover:bg-gray-100"}`}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  {item.name}
+                </a>
+              </li>
+            ))}
 
-        {/* Glass reflection effect */}
-        <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/40 to-transparent rounded-t-full pointer-events-none" />
-
-        {/* Nav Links */}
-        {navItems.map((item, index) => {
-          const isActive = activeSection === item.id;
-
-          return (
-            <motion.a
-              key={item.name}
-              href={item.href}
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                delay: 1 + index * 0.1,
-                duration: 0.6,
-                ease: [0.22, 1, 0.36, 1],
-              }}
-              whileHover={{ y: -3, scale: 1.03 }}
-              whileTap={{ scale: 0.95 }}
-              className="relative px-6 py-2.5 rounded-full text-sm font-medium group transition-all duration-300"
-            >
-              {/* Active background with gradient */}
-              {isActive && (
-                <motion.div
-                  layoutId="activeBg"
-                  className="absolute inset-0 bg-gradient-to-br from-gray-900/8 via-gray-800/6 to-gray-900/8 rounded-full shadow-[inset_0_1px_2px_rgba(0,0,0,0.1)]"
-                  transition={{ type: "spring", stiffness: 400, damping: 35 }}
-                />
-              )}
-
-              {/* Hover glow with color shift */}
-              <motion.div
-                className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700"
-                initial={false}
-                animate={{
-                  background: [
-                    "radial-gradient(circle at 50% 50%, rgba(219, 234, 254, 0) 0%, rgba(219, 234, 254, 0) 100%)",
-                    "radial-gradient(circle at 50% 50%, rgba(219, 234, 254, 0.2) 0%, rgba(219, 234, 254, 0) 70%)",
-                    "radial-gradient(circle at 50% 50%, rgba(243, 232, 255, 0.2) 0%, rgba(243, 232, 255, 0) 70%)",
-                  ],
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-              />
-
-              {/* Underline reveal effect */}
-              <motion.div className="absolute bottom-1 left-1/2 -translate-x-1/2 h-px bg-gradient-to-r from-transparent via-gray-400 to-transparent w-0 group-hover:w-3/4 transition-all duration-500" />
-
-              <span
-                className={`relative z-10 text-xs font-semibold tracking-wide transition-all duration-300 ${
-                  isActive ? "text-gray-900" : "text-gray-600 group-hover:text-gray-900"
-                }`}
+            <li>
+              <a
+                href="/resume.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block px-4 py-3 mt-2 rounded-md text-base font-semibold text-white bg-black text-center"
+                onClick={() => setMenuOpen(false)}
               >
-                {item.name}
-              </span>
-
-              {/* Enhanced dot indicator with pulse */}
-              {isActive && (
-                <>
-                  <motion.div
-                    layoutId="activeDot"
-                    className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-gray-900 rounded-full"
-                    transition={{ type: "spring", stiffness: 380, damping: 32 }}
-                  />
-                  <motion.div
-                    className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-gray-900 rounded-full"
-                    animate={{
-                      scale: [1, 2.5, 1],
-                      opacity: [0.5, 0, 0.5],
-                    }}
-                    transition={{
-                      duration: 2,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                    }}
-                  />
-                </>
-              )}
-            </motion.a>
-          );
-        })}
-
-        {/* Enhanced divider with gradient animation */}
-        <motion.div className="relative w-px h-6 mx-2 overflow-hidden">
-          <motion.div
-            className="absolute inset-0 bg-gradient-to-b from-transparent via-gray-400/80 to-transparent"
-            animate={{
-              y: ["-100%", "100%"],
-            }}
-            transition={{
-              duration: 2.5,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-gray-300/40 to-transparent" />
-        </motion.div>
-
-        {/* Premium Resume Button */}
-        <motion.a
-          href="/resume.pdf"
-          target="_blank"
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{
-            delay: 1.3,
-            duration: 0.6,
-            ease: [0.22, 1, 0.36, 1],
-          }}
-          whileHover={{ scale: 1.06, y: -3 }}
-          whileTap={{ scale: 0.95 }}
-          className="group relative px-6 py-2.5 rounded-full bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 text-white overflow-hidden flex items-center gap-2 shadow-[0_4px_20px_rgba(0,0,0,0.3)] border border-gray-800/50"
-        >
-          {/* Animated gradient border */}
-          <motion.div
-            className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100"
-            style={{
-              background:
-                "linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent)",
-            }}
-            animate={{
-              rotate: [0, 360],
-            }}
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-              ease: "linear",
-            }}
-          />
-
-          {/* Multi-layer shimmer effect */}
-          <motion.div
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent"
-            animate={{
-              x: ["-200%", "200%"],
-            }}
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-              repeatDelay: 2,
-              ease: "easeInOut",
-            }}
-          />
-
-          <motion.div
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-400/10 to-transparent"
-            animate={{
-              x: ["-200%", "200%"],
-            }}
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-              repeatDelay: 2,
-              delay: 0.5,
-              ease: "easeInOut",
-            }}
-          />
-
-          {/* Enhanced hover effect with color */}
-          <motion.div
-            className="absolute inset-0 bg-gradient-to-br from-gray-800 via-gray-700 to-gray-800"
-            initial={{ scale: 0, opacity: 0 }}
-            whileHover={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
-          />
-
-          {/* Glow effect on hover */}
-          <motion.div className="absolute inset-0 rounded-full bg-white/5 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
-          <span className="relative z-10 text-xs font-bold tracking-wide">
-            Resume
-          </span>
-
-          <motion.svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="relative z-10"
-            animate={{
-              y: [0, 3, 0],
-            }}
-            transition={{
-              duration: 1.8,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          >
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-            <polyline points="7 10 12 15 17 10" />
-            <line x1="12" y1="15" x2="12" y2="3" />
-          </motion.svg>
-        </motion.a>
+                Resume
+              </a>
+            </li>
+          </ul>
+        </nav>
       </motion.div>
-    </motion.nav>
+
+      {/* Backdrop for mobile menu (click to close) */}
+      {menuOpen && (
+        <div
+          className="fixed inset-0 bg-black/30 z-40 lg:hidden"
+          onClick={() => setMenuOpen(false)}
+          aria-hidden
+        />
+      )}
+    </>
   );
 }
