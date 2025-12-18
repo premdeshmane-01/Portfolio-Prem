@@ -1,18 +1,19 @@
-// components/ContactSection.tsx
 "use client";
 
 import React, { useState } from "react";
 
 type FormState = { name: string; email: string; message: string };
+type FormErrors = Partial<FormState>;
+type StatusState = { ok: boolean; msg: string } | null;
 
 export default function ContactSection() {
   const [form, setForm] = useState<FormState>({ name: "", email: "", message: "" });
-  const [errors, setErrors] = useState<Partial<FormState>>({});
+  const [errors, setErrors] = useState<FormErrors>({});
   const [loading, setLoading] = useState(false);
-  const [status, setStatus] = useState<null | { ok: boolean; msg: string }>(null);
+  const [status, setStatus] = useState<StatusState>(null);
 
-  const validate = (): boolean => {
-    const e: Partial<FormState> = {};
+  const validate = () => {
+    const e: FormErrors = {};
     if (!form.name.trim()) e.name = "Please enter your name";
     if (!form.email.trim()) e.email = "Please enter your email";
     else {
@@ -25,118 +26,137 @@ export default function ContactSection() {
     return Object.keys(e).length === 0;
   };
 
-  const handleChange = (k: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setForm((s) => ({ ...s, [k]: e.target.value }));
-    setErrors((prev) => ({ ...prev, [k]: undefined }));
+  const handleChange = (field: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setForm((s) => ({ ...s, [field]: e.target.value }));
+    setErrors((prev) => ({ ...prev, [field]: undefined }));
     setStatus(null);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     if (!validate()) return;
+    
     setLoading(true);
     setStatus(null);
 
     try {
-      const res = await fetch("/api/contact", {
+      const response = await fetch("/api/contact", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: form.name,
+          email: form.email,
+          message: form.message,
+          timestamp: new Date().toISOString(),
+        }),
       });
 
-      // parse body safely
-      let body;
-      try {
-        body = await res.json();
-      } catch (parseErr) {
-        body = null;
-      }
-
-      if (!res.ok) {
-        // Show detailed server message if present
-        const serverMsg = body?.error || body?.message || "Failed to send message";
-        // If validation details present, format them
-        const details = body?.details ? ` — ${JSON.stringify(body.details)}` : "";
-        console.error("Contact API error:", res.status, body);
-        throw new Error(serverMsg + details);
+      if (!response.ok) {
+        throw new Error("Failed to send message");
       }
 
       setForm({ name: "", email: "", message: "" });
-      setStatus({ ok: true, msg: body?.message || "Message sent — thank you! I’ll reply soon." });
-    } catch (err: any) {
+      setStatus({ ok: true, msg: "Message sent successfully! I'll get back to you soon." });
+      
+      setTimeout(() => setStatus(null), 5000);
+    } catch (err) {
       console.error("Send error:", err);
-      setStatus({ ok: false, msg: err?.message || "Something went wrong. Try again later." });
+      setStatus({ ok: false, msg: "Something went wrong. Please try again." });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <section id="contact" className="py-20 px-4 relative z-10">
-      <div className="max-w-4xl mx-auto text-left">
-        <h2 className="text-4xl font-bold mb-6 text-white">Get In Touch</h2>
+    <section id="contact" className="py-20 px-4 bg-white">
+      <div className="max-w-2xl mx-auto">
+        <div className="mb-12">
+          <h2 className="text-4xl font-semibold mb-3 text-gray-900">
+            Get In Touch
+          </h2>
+          <p className="text-gray-600">
+            Have a project in mind? I'd love to hear from you.
+          </p>
+        </div>
 
-        <form onSubmit={handleSubmit} className="bg-slate-900/60 p-6 rounded-2xl border border-white/10">
-          <div className="grid gap-4">
-            <label className="flex flex-col">
-              <span className="text-sm text-white/80 mb-2">Name</span>
-              <input
-                type="text"
-                value={form.name}
-                onChange={handleChange("name")}
-                placeholder="Your name"
-                className={`w-full rounded-md px-4 py-3 bg-white/5 border ${errors.name ? "border-rose-400" : "border-white/10"} text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-emerald-400`}
-                aria-invalid={Boolean(errors.name)}
-                aria-describedby={errors.name ? "name-error" : undefined}
-              />
-              {errors.name && <span id="name-error" className="text-xs text-rose-400 mt-1">{errors.name}</span>}
+        <div className="space-y-5">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Name
             </label>
-
-            <label className="flex flex-col">
-              <span className="text-sm text-white/80 mb-2">Email</span>
-              <input
-                type="email"
-                value={form.email}
-                onChange={handleChange("email")}
-                placeholder="your.email@example.com"
-                className={`w-full rounded-md px-4 py-3 bg-white/5 border ${errors.email ? "border-rose-400" : "border-white/10"} text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-emerald-400`}
-                aria-invalid={Boolean(errors.email)}
-                aria-describedby={errors.email ? "email-error" : undefined}
-              />
-              {errors.email && <span id="email-error" className="text-xs text-rose-400 mt-1">{errors.email}</span>}
-            </label>
-
-            <label className="flex flex-col">
-              <span className="text-sm text-white/80 mb-2">Message</span>
-              <textarea
-                value={form.message}
-                onChange={handleChange("message")}
-                placeholder="Your message here..."
-                rows={5}
-                className={`w-full rounded-md px-4 py-3 bg-white/5 border ${errors.message ? "border-rose-400" : "border-white/10"} text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-emerald-400`}
-                aria-invalid={Boolean(errors.message)}
-                aria-describedby={errors.message ? "message-error" : undefined}
-              />
-              {errors.message && <span id="message-error" className="text-xs text-rose-400 mt-1">{errors.message}</span>}
-            </label>
-
-            <div className="flex items-center gap-4 mt-2">
-              <button
-                type="submit"
-                disabled={loading}
-                className="inline-flex items-center justify-center px-6 py-3 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-60 text-white rounded-md font-semibold transition"
-              >
-                {loading ? "Sending..." : "Send Message"}
-              </button>
-
-              {status && (
-                <div role="status" className={`text-sm ${status.ok ? "text-emerald-300" : "text-rose-300"}`}>
-                  {status.msg}
-                </div>
-              )}
-            </div>
+            <input
+              type="text"
+              value={form.name}
+              onChange={handleChange("name")}
+              placeholder="Your name"
+              className={`w-full px-4 py-2.5 border ${
+                errors.name ? "border-red-400" : "border-gray-300"
+              } rounded-lg text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 transition-colors`}
+            />
+            {errors.name && (
+              <span className="text-xs text-red-600 mt-1 block">
+                {errors.name}
+              </span>
+            )}
           </div>
-        </form>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Email
+            </label>
+            <input
+              type="email"
+              value={form.email}
+              onChange={handleChange("email")}
+              placeholder="your@email.com"
+              className={`w-full px-4 py-2.5 border ${
+                errors.email ? "border-red-400" : "border-gray-300"
+              } rounded-lg text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 transition-colors`}
+            />
+            {errors.email && (
+              <span className="text-xs text-red-600 mt-1 block">
+                {errors.email}
+              </span>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Message
+            </label>
+            <textarea
+              value={form.message}
+              onChange={handleChange("message")}
+              placeholder="Tell me about your project..."
+              rows={5}
+              className={`w-full px-4 py-2.5 border ${
+                errors.message ? "border-red-400" : "border-gray-300"
+              } rounded-lg text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 transition-colors resize-none`}
+            />
+            {errors.message && (
+              <span className="text-xs text-red-600 mt-1 block">
+                {errors.message}
+              </span>
+            )}
+          </div>
+
+          <div className="flex items-center gap-4 pt-2">
+            <button
+              onClick={handleSubmit}
+              disabled={loading}
+              className="px-6 py-2.5 bg-gray-900 hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors"
+            >
+              {loading ? "Sending..." : "Send Message"}
+            </button>
+
+            {status && (
+              <span className={`text-sm ${status.ok ? "text-green-600" : "text-red-600"}`}>
+                {status.msg}
+              </span>
+            )}
+          </div>
+        </div>
       </div>
     </section>
   );

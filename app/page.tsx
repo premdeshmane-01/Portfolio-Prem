@@ -10,6 +10,8 @@ import CustomCursor from "./components/CustomCursor";
 import Preloader from "./components/Preloader";
 import Footer from "./components/Footer"; 
 import ProjectsSection from "./components/ProjectsSection";
+import ChatWidget from "./components/ChatWidget";
+
 
 export default function Home() {
   return (
@@ -48,6 +50,11 @@ export default function Home() {
           <Footer />
         </div>
       </div>
+       <div className="fixed bottom-6 right-6 z-[9999]">
+        <ChatWidget />
+      </div>
+
+      
     </main>
   );
 }
