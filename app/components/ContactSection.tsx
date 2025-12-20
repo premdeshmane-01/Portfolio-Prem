@@ -2,67 +2,95 @@
 
 import React, { useState } from "react";
 
-type FormState = { name: string; email: string; message: string };
-type FormErrors = Partial<FormState>;
+type FormState = {
+  name: string;
+  email: string;
+  message: string;
+  company: string; // honeypot
+};
+
+type FormErrors = Partial<Omit<FormState, "company">>;
 type StatusState = { ok: boolean; msg: string } | null;
 
 export default function ContactSection() {
-  const [form, setForm] = useState<FormState>({ name: "", email: "", message: "" });
+  const [form, setForm] = useState<FormState>({
+    name: "",
+    email: "",
+    message: "",
+    company: "", // honeypot
+  });
+
   const [errors, setErrors] = useState<FormErrors>({});
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<StatusState>(null);
 
   const validate = () => {
     const e: FormErrors = {};
+
     if (!form.name.trim()) e.name = "Please enter your name";
+
     if (!form.email.trim()) e.email = "Please enter your email";
     else {
       const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!re.test(form.email.trim())) e.email = "Please enter a valid email";
     }
-    if (!form.message.trim()) e.message = "Please enter a message";
-    else if (form.message.trim().length < 10) e.message = "Message must be at least 10 characters";
+
+    if (!form.message.trim())
+      e.message = "Please enter a message";
+    else if (form.message.trim().length < 10)
+      e.message = "Message must be at least 10 characters";
+
     setErrors(e);
     return Object.keys(e).length === 0;
   };
 
-  const handleChange = (field: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setForm((s) => ({ ...s, [field]: e.target.value }));
-    setErrors((prev) => ({ ...prev, [field]: undefined }));
-    setStatus(null);
-  };
+  const handleChange =
+    (field: keyof FormState) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      setForm((s) => ({ ...s, [field]: e.target.value }));
+      setErrors((prev) => ({ ...prev, [field]: undefined }));
+      setStatus(null);
+    };
 
   const handleSubmit = async () => {
     if (!validate()) return;
-    
+
     setLoading(true);
     setStatus(null);
 
     try {
-      const response = await fetch("/api/contact", {
+      const res = await fetch("/api/contact", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: form.name,
           email: form.email,
           message: form.message,
+          company: form.company, // honeypot
           timestamp: new Date().toISOString(),
         }),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to send message");
-      }
+      if (!res.ok) throw new Error("Failed");
 
-      setForm({ name: "", email: "", message: "" });
-      setStatus({ ok: true, msg: "Message sent successfully! I'll get back to you soon." });
-      
+      setForm({
+        name: "",
+        email: "",
+        message: "",
+        company: "",
+      });
+
+      setStatus({
+        ok: true,
+        msg: "Message sent successfully! I'll get back to you soon.",
+      });
+
       setTimeout(() => setStatus(null), 5000);
-    } catch (err) {
-      console.error("Send error:", err);
-      setStatus({ ok: false, msg: "Something went wrong. Please try again." });
+    } catch {
+      setStatus({
+        ok: false,
+        msg: "Something went wrong. Please try again.",
+      });
     } finally {
       setLoading(false);
     }
@@ -80,24 +108,32 @@ export default function ContactSection() {
           </p>
         </div>
 
+        {/* Honeypot field (hidden) */}
+        <input
+          type="text"
+          name="company"
+          value={form.company}
+          onChange={handleChange("company")}
+          tabIndex={-1}
+          autoComplete="off"
+          className="hidden"
+        />
+
         <div className="space-y-5">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Name
             </label>
             <input
-              type="text"
               value={form.name}
               onChange={handleChange("name")}
-              placeholder="Your name"
               className={`w-full px-4 py-2.5 border ${
                 errors.name ? "border-red-400" : "border-gray-300"
-              } rounded-lg text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 transition-colors`}
+              } rounded-lg focus:ring-1 focus:ring-gray-900`}
+              placeholder="Your name"
             />
             {errors.name && (
-              <span className="text-xs text-red-600 mt-1 block">
-                {errors.name}
-              </span>
+              <p className="text-xs text-red-600 mt-1">{errors.name}</p>
             )}
           </div>
 
@@ -106,18 +142,15 @@ export default function ContactSection() {
               Email
             </label>
             <input
-              type="email"
               value={form.email}
               onChange={handleChange("email")}
-              placeholder="your@email.com"
               className={`w-full px-4 py-2.5 border ${
                 errors.email ? "border-red-400" : "border-gray-300"
-              } rounded-lg text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 transition-colors`}
+              } rounded-lg focus:ring-1 focus:ring-gray-900`}
+              placeholder="your@email.com"
             />
             {errors.email && (
-              <span className="text-xs text-red-600 mt-1 block">
-                {errors.email}
-              </span>
+              <p className="text-xs text-red-600 mt-1">{errors.email}</p>
             )}
           </div>
 
@@ -126,18 +159,16 @@ export default function ContactSection() {
               Message
             </label>
             <textarea
+              rows={5}
               value={form.message}
               onChange={handleChange("message")}
-              placeholder="Tell me about your project..."
-              rows={5}
               className={`w-full px-4 py-2.5 border ${
                 errors.message ? "border-red-400" : "border-gray-300"
-              } rounded-lg text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 transition-colors resize-none`}
+              } rounded-lg focus:ring-1 focus:ring-gray-900 resize-none`}
+              placeholder="Tell me about your project..."
             />
             {errors.message && (
-              <span className="text-xs text-red-600 mt-1 block">
-                {errors.message}
-              </span>
+              <p className="text-xs text-red-600 mt-1">{errors.message}</p>
             )}
           </div>
 
@@ -145,13 +176,17 @@ export default function ContactSection() {
             <button
               onClick={handleSubmit}
               disabled={loading}
-              className="px-6 py-2.5 bg-gray-900 hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors"
+              className="px-6 py-2.5 bg-gray-900 text-white rounded-lg disabled:opacity-50"
             >
               {loading ? "Sending..." : "Send Message"}
             </button>
 
             {status && (
-              <span className={`text-sm ${status.ok ? "text-green-600" : "text-red-600"}`}>
+              <span
+                className={`text-sm ${
+                  status.ok ? "text-green-600" : "text-red-600"
+                }`}
+              >
                 {status.msg}
               </span>
             )}

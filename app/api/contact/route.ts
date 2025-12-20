@@ -3,7 +3,12 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
-    const { name, email, message, timestamp } = await req.json();
+    const { name, email, message, company, timestamp } = await req.json();
+
+    // Honeypot check (bot detected)
+    if (company) {
+      return NextResponse.json({ success: true });
+    }
 
     if (!name || !email || !message) {
       return NextResponse.json(
@@ -23,8 +28,8 @@ export async function POST(req: Request) {
     await transporter.sendMail({
       from: `"Portfolio Contact" <${process.env.EMAIL_USER}>`,
       to: process.env.EMAIL_TO,
-      subject: `New Contact Message from ${name}`,
       replyTo: email,
+      subject: `New Contact Message from ${name}`,
       text: `
 Name: ${name}
 Email: ${email}
@@ -36,8 +41,8 @@ ${message}
     });
 
     return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error("Mail error:", error);
+  } catch (err) {
+    console.error("Contact API error:", err);
     return NextResponse.json(
       { error: "Failed to send message" },
       { status: 500 }

@@ -10,6 +10,8 @@ import {
 } from "framer-motion";
 import Image from "next/image";
 
+
+
 export default function Hero() {
   // viewport tracking — used to choose image + object positioning
   const [vw, setVw] = useState<number>(typeof window !== "undefined" ? window.innerWidth : 1200);
@@ -69,6 +71,7 @@ export default function Hero() {
 
   return (
     <motion.section
+    id="home"
       style={{ y: heroY }}
       className="fixed inset-0 w-full h-[100dvh] z-0 overflow-hidden bg-[#0a0a0a]"
       onMouseMove={handleMouseMove}
@@ -103,6 +106,8 @@ export default function Hero() {
               'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.65\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")',
           }}
         />
+
+        
 
         {/* Mobile Gradient (darken bottom) */}
         <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/60 to-transparent sm:hidden" />

@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+html {
+  scroll-behavior: smooth;
+}
+
+
 :root {
   /* MANTIS LIGHT STEALTH PALETTE */
   --bg-dark: #DEDEDE;       /* Light Gray Base */

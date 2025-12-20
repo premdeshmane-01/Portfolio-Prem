@@ -4,7 +4,7 @@ import Hero from "./components/Hero";
 // import Background3D from "./components/Background3D"; 
 import Skills from "./components/Skills"; 
 import About from "./components/About"; 
-import VideoIntro from "./components/VideoIntro";
+import ContactSection from "./components/ContactSection";
 import Navbar from "./components/Navbar"; 
 import CustomCursor from "./components/CustomCursor";
 import Preloader from "./components/Preloader";
@@ -38,7 +38,7 @@ export default function Home() {
           {/* Small spacer for breathing room before next sections */}
           <div className="h-12 md:h-16" />
 
-          <VideoIntro />
+          <ContactSection />
          
 
           {/* Bottom text inside content */}
