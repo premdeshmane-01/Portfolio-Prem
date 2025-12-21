@@ -1,5 +1,6 @@
 "use client";
 
+
 import React, { useEffect, useState } from "react";
 import {
   motion,
@@ -12,9 +13,12 @@ import Image from "next/image";
 
 
 
+
 export default function Hero() {
   // viewport tracking — used to choose image + object positioning
   const [vw, setVw] = useState<number>(typeof window !== "undefined" ? window.innerWidth : 1200);
+  const [freezeMotion, setFreezeMotion] = useState(false);
+
 
   useEffect(() => {
     const onResize = () => setVw(window.innerWidth);
@@ -39,6 +43,19 @@ export default function Hero() {
     mouseY.set(clientY / innerHeight - 0.5);
   };
 
+
+  useEffect(() => {
+  const onScroll = () => {
+    if (window.scrollY > window.innerHeight * 0.6) {
+      setFreezeMotion(true);
+      window.removeEventListener("scroll", onScroll);
+    }
+  };
+
+  window.addEventListener("scroll", onScroll, { passive: true });
+  return () => window.removeEventListener("scroll", onScroll);
+}, []);
+
   const springConfig = { damping: 25, stiffness: 150 };
   const moveX = useSpring(useTransform(mouseX, [-0.5, 0.5], [-20, 20]), springConfig);
   const moveY = useSpring(useTransform(mouseY, [-0.5, 0.5], [-20, 20]), springConfig);
@@ -49,8 +66,8 @@ export default function Hero() {
   // 1) If you have a mobile-cropped image, name it '/yes-mobile.jpg' (or change below).
   // 2) The component will choose mobile image for vw < 640; otherwise uses desktop image.
   // 3) Still apply objectPosition to nudge the focal point when mobile image is not available.
-  const desktopSrc = "/yes.jpg";
-  const mobileSrc = "/yes-mobile.jpg"; // optional — provide this for best results
+  const desktopSrc = "/yes1.webp";
+  const mobileSrc = "/mobile.webp"; // optional — provide this for best results
 
   // choose src - we try to use mobileSrc when on small screens
   const usingMobileImage = vw < 640;

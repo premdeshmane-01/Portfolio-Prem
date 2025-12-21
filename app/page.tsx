@@ -6,7 +6,7 @@ import Skills from "./components/Skills";
 import About from "./components/About"; 
 import ContactSection from "./components/ContactSection";
 import Navbar from "./components/Navbar"; 
-import CustomCursor from "./components/CustomCursor";
+
 import Preloader from "./components/Preloader";
 import Footer from "./components/Footer"; 
 import ProjectsSection from "./components/ProjectsSection";
@@ -17,7 +17,7 @@ export default function Home() {
   return (
     <main className="min-h-screen relative text-black selection:bg-[#00C853] selection:text-white overflow-x-hidden">
       <Preloader />
-      <CustomCursor />
+
       <Navbar />
       
       {/* GLOBAL BACKGROUND - Fixed behind everything */}

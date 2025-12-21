@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
-html {
+html, body {
+  cursor: auto;
   scroll-behavior: smooth;
 }
 
@@ -15,18 +16,17 @@ html {
   --accent: #000000;        /* PURE BLACK ACCENT (Stealth) */
   --accent-dim: #333333;    /* Dark Gray */
 }
-html {
+/* html {
   scroll-behavior: smooth;
-}
+} */
 
 
-body {
+/* body {
   color: var(--text-main);
   background-color: var(--bg-dark);
   font-family: 'Inter', sans-serif; 
   overflow-x: hidden;
-  cursor: none; 
-}
+} */
 
 /* Subtle Grid Background */
 body::before {
