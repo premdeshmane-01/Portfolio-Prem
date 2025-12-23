@@ -14,7 +14,7 @@ export default function ChatWidget() {
     {
       role: "assistant",
       content:
-        "Hey! I’m PremBot. Ask me about Prem, his projects, or anything else—I’ll try to be helpful and only mildly sarcastic.",
+        "Hey! I’m ChatBot. Ask me about Prem, his projects, or anything else—I’ll try to be helpful and only mildly sarcastic.",
     },
   ]);
   const [input, setInput] = useState("");
@@ -40,7 +40,7 @@ if (!res.ok) {
     {
       role: "assistant",
       content:
-        "Hey, I’m PremBot. Curious about Prem’s projects, skills, or why he likes clean UI? Ask away.",
+        "Hey, I’m ChatBot. Curious about Prem’s projects, skills, or why he likes clean UI? Ask away.",
     },
   ]);
   setLoading(false);
@@ -72,7 +72,7 @@ const data = await res.json();
       {open && (
         <div className="fixed bottom-24 right-6 z-[9999] w-80 rounded-xl bg-[#0f0f0f] text-white shadow-2xl flex flex-col">
           <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
-            <span className="font-semibold">PremBot</span>
+            <span className="font-semibold">ChatBot</span>
             <button onClick={() => setOpen(false)}>✕</button>
           </div>
 

@@ -30,14 +30,15 @@ export default function Footer() {
 
   return (
     <section id="contact" className="w-full relative z-10">
-      <footer className="w-full bg-gradient-to-br from-[#2a0510] to-[#0f0205] text-white border-t border-white/10">
+      <footer className="w-full bg-gradient-to-br from-[#3b0a18] via-[#24070f] to-[#160409] text-white border-t border-white/10">
+
         
         {/* Main Content Container */}
         <div className="w-full px-6 md:px-12 lg:px-24 py-10 lg:py-12 relative overflow-hidden">
           
           {/* Subtle Background Grid */}
           <div
-            className="absolute inset-0 pointer-events-none opacity-[0.03] z-0"
+            className="absolute inset-0 pointer-events-none opacity-[0.05] z-0"
             style={{
               background:
                 "linear-gradient(to right, #fff 1px, transparent 1px), linear-gradient(to bottom, #fff 1px, transparent 1px)",
@@ -50,10 +51,16 @@ export default function Footer() {
             
             {/* COLUMN 1: Brand & Status */}
             <div className="flex flex-col gap-4">
-              <h2 className="text-2xl font-bold tracking-tighter">PREMSAGAR</h2>
-              <p className="text-white/60 text-sm leading-relaxed max-w-xs">
-                Building digital experiences with precision and passion. Always open to discussing new ideas and opportunities.
-              </p>
+              <h2 className="text-3xl md:text-4xl font-bold tracking-tight [word-spacing:0.3em] leading-tight">
+  PREMSAGAR DESHMANE
+</h2>
+
+              <p className="text-white/80 text-base md:text-sm leading-relaxed max-w-sm">
+
+
+  Designing and engineering systems where clarity, performance, and intent come together. Always open to meaningful problems and thoughtful collaboration.
+</p>
+
               
               {/* Status Badge */}
               <div className="flex items-center gap-2 mt-2 w-fit px-3 py-1.5 bg-white/5 rounded-full border border-white/10">
@@ -67,7 +74,8 @@ export default function Footer() {
 
             {/* COLUMN 2: Navigation (Compact List) */}
             <div className="flex flex-col gap-4">
-              <h3 className="text-sm font-bold text-white/40 uppercase tracking-widest">Navigation</h3>
+              <h3 className="text-sm md:text-base font-semibold text-white/50 uppercase tracking-wider">
+Navigation</h3>
               <nav className="flex flex-col gap-2">
                 {["Home", "About", "Projects", "Contact", "Resume"].map((item, idx) => (
                   <a
@@ -86,7 +94,7 @@ export default function Footer() {
 
             {/* COLUMN 3: Contact & Socials */}
             <div className="flex flex-col gap-4">
-              <h3 className="text-sm font-bold text-white/40 uppercase tracking-widest">Get in touch</h3>
+              <h3 className="text-sm">Get in touch</h3>
               
               <div className="flex flex-col gap-1">
                 <a

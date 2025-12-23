@@ -1,14 +1,19 @@
 "use client";
 
-import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
-import React, { useEffect, useState, type MouseEvent } from "react";
+import {
+  motion,
+  useScroll,
+  useTransform,
+  AnimatePresence,
+} from "framer-motion";
+import React, { useEffect, useState } from "react";
+import { Linkedin, Github, Mail } from "lucide-react";
 
-// 1. Defined nav items (Contact is included here)
 const navItems = [
-  { name: "Home", href: "#home", id: "home" },
-  { name: "About", href: "#about", id: "about" },
-  { name: "Projects", href: "#projects", id: "projects" },
-  { name: "Contact", href: "#contact", id: "contact" },
+  { name: "Home", id: "home" },
+  { name: "About", id: "about" },
+  { name: "Projects", id: "projects" },
+  { name: "Contact", id: "contact" },
 ];
 
 export default function Navbar() {
@@ -16,247 +21,198 @@ export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
   const [menuOpen, setMenuOpen] = useState(false);
-  const [isTouch, setIsTouch] = useState(false);
   const [isSmall, setIsSmall] = useState(false);
 
-  // Framer Motion: adjusted ranges so nav is fully visible at top (opacity 1)
-  const navOpacity = useTransform(scrollY, [0, 50], [1, 1]); 
-  const navScale = useTransform(scrollY, [0, 50], [1, 0.98]); 
-  const navY = useTransform(scrollY, [0, 50], [0, -2]);
+  const navOpacity = useTransform(scrollY, [0, 50], [1, 1]);
+  const navScale = useTransform(scrollY, [0, 50], [1, 0.98]);
 
-  // Device Check
+  /* ---------- device ---------- */
   useEffect(() => {
-    const checkDevice = () => {
-      setIsSmall(window.innerWidth < 1024);
-      setIsTouch("ontouchstart" in window || navigator.maxTouchPoints > 0);
-    };
-    checkDevice();
-    window.addEventListener("resize", checkDevice);
-    return () => window.removeEventListener("resize", checkDevice);
+    const onResize = () => setIsSmall(window.innerWidth < 1024);
+    onResize();
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
   }, []);
 
-  // Scroll Spy Logic
+  /* ---------- scroll spy ---------- */
   useEffect(() => {
-    const updateScroll = () => {
-      const currentScroll = window.scrollY;
-      setIsScrolled(currentScroll > 20);
+    const onScroll = () => {
+      const y = window.scrollY;
+      setIsScrolled(y > 20);
 
-      // A. Force "Home" active if near top
-      if (currentScroll < 100) {
+      if (y < 100) {
         setActiveSection("home");
         return;
       }
 
-      // B. Force "Contact" active if at bottom of page
-      // This fixes the issue where short contact sections don't trigger
-      if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 20) {
-        setActiveSection("contact");
-        return;
-      }
-
-      // C. Standard Section Checks
-      const sectionIds = ["contact", "projects", "about"]; 
-      for (const id of sectionIds) {
+      for (const id of ["contact", "projects", "about"]) {
         const el = document.getElementById(id);
-        if (el) {
-          const offsetTop = el.offsetTop;
-          if (currentScroll + 150 >= offsetTop) {
-            setActiveSection(id);
-            return; 
-          }
+        if (el && y + 160 >= el.offsetTop) {
+          setActiveSection(id);
+          return;
         }
       }
     };
 
-    window.addEventListener("scroll", updateScroll, { passive: true });
-    updateScroll(); 
-    return () => window.removeEventListener("scroll", updateScroll);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
-    e.preventDefault(); 
-    setActiveSection(id);
+  const handleNav = (id: string) => {
     setMenuOpen(false);
+    setActiveSection(id);
 
     if (id === "home") {
       window.scrollTo({ top: 0, behavior: "smooth" });
-    } else {
-      const element = document.getElementById(id);
-      if (element) {
-        const offset = 80; // Navbar buffer
-        const bodyRect = document.body.getBoundingClientRect().top;
-        const elementRect = element.getBoundingClientRect().top;
-        const elementPosition = elementRect - bodyRect;
-        const offsetPosition = elementPosition - offset;
-
-        window.scrollTo({
-          top: offsetPosition,
-          behavior: "smooth"
-        });
-      }
+      return;
     }
-  };
 
-  const toggleMenu = (e?: React.KeyboardEvent | React.MouseEvent) => {
-    if (!e) return setMenuOpen((v) => !v);
-    if ("key" in (e as any)) {
-      const ke = e as React.KeyboardEvent;
-      if (ke.key === "Enter" || ke.key === " ") {
-        ke.preventDefault();
-        setMenuOpen((v) => !v);
-      }
-    } else {
-      setMenuOpen((v) => !v);
-    }
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    const y = el.getBoundingClientRect().top + window.scrollY - 90;
+    window.scrollTo({ top: y, behavior: "smooth" });
   };
 
   return (
     <>
+      {/* ================= NAV BAR ================= */}
       <motion.nav
-        initial={{ y: -32, opacity: 0 }}
+        initial={{ y: -30, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.1, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-        className="fixed inset-x-0 top-6 z-50 flex justify-end lg:justify-center px-4 pointer-events-none"
-        aria-label="Primary navigation"
+        transition={{ duration: 0.5 }}
+        className="fixed top-6 inset-x-0 z-50 flex justify-end lg:justify-center px-4 pointer-events-none"
       >
         <motion.div
-          style={{ opacity: navOpacity, scale: navScale, y: navY }}
-          className={`pointer-events-auto relative flex items-center gap-2 transition-all duration-500 overflow-hidden
+          style={{ opacity: navOpacity, scale: navScale }}
+          className={`pointer-events-auto flex items-center px-4 py-3 rounded-full
             ${
               isSmall
-                ? "px-2 py-2 min-w-[auto] rounded-lg bg-white/90 border border-white/10 shadow-md"
-                : "px-4 py-3 rounded-full bg-white/80 border border-white/40 backdrop-blur-md shadow-sm"
+                ? "bg-transparent border-transparent"
+                : `backdrop-blur-xl border border-white/30 ${
+                    isScrolled ? "bg-white/90" : "bg-white/70"
+                  }`
             }
-            ${isScrolled ? "shadow-md bg-white/95 border-white/60" : ""}
           `}
         >
-          {/* Desktop Navigation */}
+          {/* ---------- DESKTOP ---------- */}
           <div className="hidden lg:flex items-center gap-2">
-            {!isSmall && !isTouch && (
-               <div className="absolute inset-0 rounded-full opacity-40 pointer-events-none -z-10">
-               <motion.div
-                 className="absolute inset-0 rounded-full"
-                 animate={{
-                   background: [
-                     "radial-gradient(circle at 20% 50%, rgba(219, 234, 254, 0.35) 0%, transparent 40%)",
-                     "radial-gradient(circle at 80% 50%, rgba(243, 232, 255, 0.35) 0%, transparent 40%)",
-                     "radial-gradient(circle at 50% 80%, rgba(252, 231, 243, 0.35) 0%, transparent 40%)",
-                   ],
-                 }}
-                 transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-               />
-             </div>
-            )}
-
             {navItems.map((item) => {
-              const isActive = activeSection === item.id;
+              const active = activeSection === item.id;
               return (
-                <a
+                <button
                   key={item.id}
-                  href={item.href}
-                  onClick={(e) => handleNavClick(e, item.id)}
-                  className={`relative z-10 px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400
-                    ${isActive ? "text-gray-900" : "text-gray-600 hover:text-gray-900"}
+                  onClick={() => handleNav(item.id)}
+                  className={`relative px-4 py-2 rounded-full text-sm font-medium transition
+                    ${active ? "text-black" : "text-gray-600 hover:text-black"}
                   `}
-                  aria-current={isActive ? "page" : undefined}
                 >
-                  <span className="relative z-10">{item.name}</span>
-                  {isActive && (
+                  {item.name}
+                  {active && (
                     <motion.span
-                      layoutId="activePill"
-                      className="absolute inset-0 rounded-full bg-gray-100 -z-0"
+                      layoutId="nav-active"
+                      className="absolute inset-0 bg-gray-100 rounded-full -z-10"
                       transition={{ type: "spring", stiffness: 300, damping: 30 }}
                     />
                   )}
-                </a>
+                </button>
               );
             })}
 
-            <div className="relative w-px h-6 mx-2 bg-gray-300" />
+            <div className="w-px h-6 bg-gray-300 mx-2" />
 
             <a
               href="/resume.pdf"
               target="_blank"
-              rel="noopener noreferrer"
-              className="relative z-10 px-4 py-2 rounded-full bg-black text-white text-sm font-semibold flex items-center gap-2 hover:opacity-80 transition-opacity"
+              className="px-4 py-2 rounded-full bg-black text-white text-sm font-semibold"
             >
-              <span>Resume</span>
+              Resume
             </a>
           </div>
 
-          {/* Mobile Hamburger */}
-          <div className="flex items-center lg:hidden">
+          {/* ---------- MOBILE MENU BUTTON ---------- */}
+          <div className="lg:hidden">
             <button
+              aria-label="Menu"
               onClick={() => setMenuOpen((v) => !v)}
-              onKeyDown={(e) => toggleMenu(e)}
-              aria-label={menuOpen ? "Close menu" : "Open menu"}
-              className="z-10 inline-flex items-center justify-center p-2 rounded-md bg-white/50 hover:bg-white focus:outline-none"
+              className="
+                flex items-center justify-center
+                w-10 h-10 rounded-full
+                bg-white/5 backdrop-blur-md
+                border border-white/20
+                hover:bg-white/10
+                transition-all
+                active:scale-95
+              "
             >
-              <svg className="w-6 h-6 text-gray-800" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                {menuOpen ? (
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                ) : (
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 8h16M4 16h16" />
-                )}
-              </svg>
+              <img
+                src="/menu-bar.svg"
+                alt="Menu"
+                className="w-5 h-5"
+                style={{ filter: "invert(1)" }}
+              />
             </button>
           </div>
         </motion.div>
       </motion.nav>
 
-      {/* Mobile Menu Overlay */}
+      {/* ================= MOBILE OVERLAY ================= */}
       <AnimatePresence>
         {menuOpen && (
-          <>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-40 lg:hidden"
+          >
+            {/* glass backdrop */}
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-2xl" />
+
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/30 z-40 lg:hidden"
-              onClick={() => setMenuOpen(false)}
-            />
-            
-            <motion.div
-              initial={{ x: "100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "100%" }}
-              transition={{ type: "spring", stiffness: 280, damping: 30 }}
-              className="fixed top-0 right-0 h-full w-full max-w-xs bg-white shadow-xl z-50 lg:hidden p-4"
+              initial={{ y: 40, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 40, opacity: 0 }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+              className="relative z-10 h-full flex flex-col items-center justify-center gap-10 text-white"
             >
-               <div className="flex justify-between items-center mb-6">
-                 <span className="font-bold text-lg">Menu</span>
-                 <button onClick={() => setMenuOpen(false)}>
-                   <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                   </svg>
-                 </button>
-               </div>
-               
-               <ul className="space-y-2">
-                {navItems.map((item) => (
-                  <li key={item.id}>
-                    <a
-                      href={item.href}
-                      className={`block px-4 py-3 rounded-lg font-medium transition-colors
-                        ${activeSection === item.id ? "bg-indigo-50 text-indigo-700" : "text-gray-700 hover:bg-gray-100"}`}
-                      onClick={(e) => handleNavClick(e, item.id)}
-                    >
-                      {item.name}
-                    </a>
-                  </li>
-                ))}
-                <li>
-                  <a
-                    href="/resume.pdf"
-                    target="_blank"
-                    className="block px-4 py-3 mt-4 text-center rounded-lg bg-black text-white font-semibold"
+              {/* nav links */}
+              <nav className="flex flex-col items-center gap-6">
+                {navItems.map((item, i) => (
+                  <motion.button
+                    key={item.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.08 }}
+                    onClick={() => handleNav(item.id)}
+                    className="text-3xl font-semibold tracking-tight"
                   >
-                    Resume
-                  </a>
-                </li>
-               </ul>
+                    {item.name}
+                  </motion.button>
+                ))}
+              </nav>
+
+              {/* socials */}
+              <div className="flex gap-6 mt-6">
+                {[
+                  { icon: Linkedin, href: "https://linkedin.com/in/prem-deshmane01" },
+                  { icon: Github, href: "https://github.com/premdeshmane-01" },
+                  { icon: Mail, href: "mailto:premdeshmane01@gmail.com" },
+                ].map((s, i) => (
+                  <motion.a
+                    key={i}
+                    href={s.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    whileHover={{ scale: 1.1 }}
+                    className="p-3 rounded-full bg-white/10 border border-white/20"
+                  >
+                    <s.icon size={22} />
+                  </motion.a>
+                ))}
+              </div>
             </motion.div>
-          </>
+          </motion.div>
         )}
       </AnimatePresence>
     </>

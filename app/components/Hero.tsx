@@ -99,20 +99,29 @@ export default function Hero() {
         style={{ scale, opacity, x: bgMoveX, y: bgMoveY }}
       >
         <Image
-          // IMPORTANT: if you do not have a mobile-cropped image, set mobileSrc = desktopSrc above
-          src={chosenSrc}
-          alt="Hero Background"
-          fill
-          // Keep cover, but set objectPosition dynamically so important area stays visible on phones.
-          style={{
-            objectFit: "cover",
-            objectPosition: objectPosition,
-          }}
-          // sizes hint helps Next/Image pick an appropriate resolution
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 60vw, 50vw"
-          priority
-          quality={90}
-        />
+  src={chosenSrc}
+  alt="Hero Background"
+  fill
+  priority
+  sizes="100vw"
+  quality={90}
+  className="
+    object-cover
+    sm:filter-none
+    sm:blur-0
+    sm:contrast-100
+    sm:saturate-100
+
+    filter
+    blur-[6px]
+    contrast-90
+    saturate-90
+  "
+  style={{
+    objectPosition: objectPosition,
+  }}
+/>
+
 
         {/* Grain Overlay */}
         <div
