@@ -17,7 +17,7 @@ export default function Footer() {
       );
     };
     updateTime();
-    const id = setInterval(updateTime, 60_000); 
+    const id = setInterval(updateTime, 60_000);
     return () => clearInterval(id);
   }, []);
 
@@ -29,62 +29,74 @@ export default function Footer() {
   };
 
   return (
-    <section id="contact" className="w-full relative z-10">
-      <footer className="w-full bg-gradient-to-br from-[#3b0a18] via-[#24070f] to-[#160409] text-white border-t border-white/10">
+    <section id="contact" className="relative z-10">
+      <footer className="relative w-full text-white border-t border-white/10 overflow-hidden">
 
-        
-        {/* Main Content Container */}
-        <div className="w-full px-6 md:px-12 lg:px-24 py-10 lg:py-12 relative overflow-hidden">
-          
-          {/* Subtle Background Grid */}
-          <div
-            className="absolute inset-0 pointer-events-none opacity-[0.05] z-0"
-            style={{
-              background:
-                "linear-gradient(to right, #fff 1px, transparent 1px), linear-gradient(to bottom, #fff 1px, transparent 1px)",
-              backgroundSize: "40px 40px",
-            }}
-          />
+        {/* DESKTOP BACKGROUND */}
+        <div className="hidden md:block absolute inset-0 bg-gradient-to-br from-[#3b0a18] via-[#24070f] to-[#160409]" />
 
-          {/* GRID LAYOUT: 1 Col Mobile, 3 Cols Desktop */}
-          <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-8 lg:gap-12">
-            
-            {/* COLUMN 1: Brand & Status */}
-            <div className="flex flex-col gap-4">
-              <h2 className="text-3xl md:text-4xl font-bold tracking-tight [word-spacing:0.3em] leading-tight">
-  PREMSAGAR DESHMANE
-</h2>
+        {/* MOBILE BACKGROUND */}
+        <div className="md:hidden absolute inset-0 bg-[#070707]" />
 
-              <p className="text-white/80 text-base md:text-sm leading-relaxed max-w-sm">
+        {/* WATERMARK */}
+        <div className="pointer-events-none absolute inset-0 flex justify-center">
+          <span
+            className="
+              mt-[55%] md:mt-[65%]
+              text-[22vw] md:text-[12vw]
+              font-black tracking-tight
+              text-white/[0.04]
+              blur-[2px]
+              select-none
+              whitespace-nowrap
+            "
+            aria-hidden
+          >
+            EXPERIENCES
+          </span>
+        </div>
 
+        {/* CONTENT */}
+        <div className="relative px-6 sm:px-10 md:px-16 lg:px-24 py-12 md:py-14">
 
-  Designing and engineering systems where clarity, performance, and intent come together. Always open to meaningful problems and thoughtful collaboration.
-</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-10 text-center md:text-left">
 
-              
-              {/* Status Badge */}
-              <div className="flex items-center gap-2 mt-2 w-fit px-3 py-1.5 bg-white/5 rounded-full border border-white/10">
+            {/* BRAND */}
+            <div className="space-y-5 flex flex-col items-center md:items-start">
+              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight leading-tight">
+                PREMSAGAR <span className="text-white/40">DESHMANE</span>
+              </h2>
+
+              <p className="text-white/70 text-sm sm:text-base max-w-sm">
+                Designing and engineering systems where clarity, performance,
+                and intent come together.
+              </p>
+
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur">
                 <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                  <span className="absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-60 animate-ping" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-green-400" />
                 </span>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-white/80">Open to Work</span>
+                <span className="text-[11px] uppercase tracking-widest text-white/80 font-semibold">
+                  Open to Work
+                </span>
               </div>
             </div>
 
-            {/* COLUMN 2: Navigation (Compact List) */}
-            <div className="flex flex-col gap-4">
-              <h3 className="text-sm md:text-base font-semibold text-white/50 uppercase tracking-wider">
-Navigation</h3>
-              <nav className="flex flex-col gap-2">
-                {["Home", "About", "Projects", "Contact", "Resume"].map((item, idx) => (
+            {/* NAVIGATION */}
+            <div className="flex flex-col gap-4 items-center md:items-start">
+              <h3 className="text-xs uppercase tracking-[0.25em] text-white/40">
+                Navigation
+              </h3>
+
+              {/* Mobile: 3x2 grid | Desktop: column */}
+              <nav className="grid grid-cols-3 gap-x-6 gap-y-3 md:flex md:flex-col md:gap-3">
+                {["Home", "About", "Projects", "Contact", "Resume"].map((item) => (
                   <a
-                    key={idx}
+                    key={item}
                     href={item === "Resume" ? "/resume.pdf" : `#${item.toLowerCase()}`}
-                    onClick={(e) => {
-                        if (item === "Home") handleNavClick(e, "home");
-                    }}
-                    className="text-white/80 hover:text-[#00C853] transition-colors w-fit text-sm font-medium"
+                    onClick={(e) => item === "Home" && handleNavClick(e, "home")}
+                    className="text-white/75 hover:text-white transition text-sm font-medium text-center md:text-left"
                   >
                     {item}
                   </a>
@@ -92,58 +104,50 @@ Navigation</h3>
               </nav>
             </div>
 
-            {/* COLUMN 3: Contact & Socials */}
-            <div className="flex flex-col gap-4">
-              <h3 className="text-sm">Get in touch</h3>
-              
-              <div className="flex flex-col gap-1">
+            {/* CONTACT */}
+            <div className="flex flex-col gap-5 items-center md:items-start">
+              <h3 className="text-xs uppercase tracking-[0.25em] text-white/40">
+                Get in touch
+              </h3>
+
+              <div className="space-y-1">
                 <a
                   href="mailto:premdeshmane01@gmail.com"
-                  className="text-lg font-medium text-white hover:text-[#00C853] transition-colors break-all"
+                  className="text-lg font-medium hover:text-white/80 transition"
                 >
                   premdeshmane01@gmail.com
                 </a>
-                <p className="text-xs text-white/50">Nashik, India • {time}</p>
+                <p className="text-xs text-white/40">
+                  Nashik, India • {time}
+                </p>
               </div>
 
-              {/* Social Icons (Compact) */}
-              <div className="flex gap-3 mt-2">
+              <div className="flex gap-4 pt-2">
                 {[
                   { icon: Linkedin, href: "https://linkedin.com/in/prem-deshmane01" },
                   { icon: Github, href: "https://github.com/premdeshmane-01" },
-                  { icon: Mail, href: "mailto:premdeshmane01@gmail.com" }
-                ].map((social, idx) => (
+                  { icon: Mail, href: "mailto:premdeshmane01@gmail.com" },
+                ].map((s, i) => (
                   <a
-                    key={idx}
-                    href={social.href}
+                    key={i}
+                    href={s.href}
                     target="_blank"
                     rel="noreferrer"
-                    className="p-2 rounded-lg bg-white/5 border border-white/10 hover:bg-white hover:text-[#3B0717] transition-all"
+                    className="p-3 rounded-full bg-white/5 border border-white/10 backdrop-blur hover:bg-white hover:text-black transition"
                   >
-                    <social.icon size={18} />
+                    <s.icon size={18} />
                   </a>
                 ))}
               </div>
             </div>
           </div>
 
-          {/* Divider */}
-          <div className="h-px w-full bg-white/10 my-8 relative z-10"></div>
+          <div className="h-px w-full bg-white/10 my-10" />
 
-          {/* Bottom Bar: Copyright */}
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4 relative z-10 text-xs text-white/40">
-            <p>© 2025 Premsagar Deshmane. All rights reserved.</p>
-            <p>Designed & Built with Next.js</p>
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-white/40">
+            <span>© 2025 Premsagar Deshmane</span>
+            <span>Designed & built with intent</span>
           </div>
-
-          {/* Watermark (Very Subtle & Small now) */}
-          <h1
-            className="absolute bottom-0 right-0 translate-y-[20%] translate-x-[10%] text-[8rem] font-black text-white/[0.02] select-none pointer-events-none z-0 tracking-tighter leading-none"
-            aria-hidden
-          >
-            PREMSAGAR
-          </h1>
-
         </div>
       </footer>
     </section>

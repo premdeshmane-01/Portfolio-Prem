@@ -67,7 +67,7 @@ export default function Hero() {
   // 2) The component will choose mobile image for vw < 640; otherwise uses desktop image.
   // 3) Still apply objectPosition to nudge the focal point when mobile image is not available.
   const desktopSrc = "/yes1.webp";
-  const mobileSrc = "/mobile.webp"; // optional — provide this for best results
+  const mobileSrc = "/mobileo.webp"; // optional — provide this for best results
 
   // choose src - we try to use mobileSrc when on small screens
   const usingMobileImage = vw < 640;
