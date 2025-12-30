@@ -4,25 +4,27 @@ import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
+const SITE_URL = "https://your-project-name.vercel.app";
+
 export const metadata: Metadata = {
-  metadataBase: new URL("https://yourdomain.com"),
+  metadataBase: new URL(SITE_URL),
 
   title: {
-    default: "Premsagar Deshmane | Frontend & AI Engineer",
+    default: "Premsagar Deshmane | Computer Engineering Student & Frontend Engineer",
     template: "%s | Premsagar Deshmane",
   },
 
   description:
-    "Premsagar Deshmane is a Computer Engineering student and Frontend & AI Engineer building reliable, well-designed systems and intelligent web experiences.",
+    "Official portfolio of Premsagar Deshmane, a Computer Engineering student and Frontend & AI Engineer building reliable, performance-focused, and well-designed web systems.",
 
   keywords: [
     "Premsagar Deshmane",
+    "Premsagar Deshmane Portfolio",
     "Frontend Engineer",
     "AI Engineer",
     "Next.js Developer",
     "React Developer",
     "Computer Engineering Student",
-    "Portfolio Website",
   ],
 
   authors: [{ name: "Premsagar Deshmane" }],
@@ -34,11 +36,11 @@ export const metadata: Metadata = {
 
   openGraph: {
     type: "website",
-    url: "https://yourdomain.com",
+    url: SITE_URL,
     siteName: "Premsagar Deshmane",
     title: "Premsagar Deshmane | Frontend & AI Engineer",
     description:
-      "Portfolio of Premsagar Deshmane — Frontend, AI, and system-focused engineering.",
+      "Portfolio of Premsagar Deshmane — frontend engineering, AI systems, and modern web architecture.",
     images: [
       {
         url: "/og-image.png",
@@ -73,7 +75,7 @@ export default function RootLayout({
       <body className={inter.className} suppressHydrationWarning>
         {children}
 
-        {/* Structured data for SEO */}
+        {/* Structured Data: Personal Identity */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -81,15 +83,15 @@ export default function RootLayout({
               "@context": "https://schema.org",
               "@type": "Person",
               name: "Premsagar Deshmane",
-              url: "https://yourdomain.com",
-              jobTitle: "Frontend & AI Engineer",
+              url: SITE_URL,
+              jobTitle: "Computer Engineering Student & Frontend Engineer",
               sameAs: [
-                "https://www.linkedin.com/in/your-linkedin",
-                "https://github.com/your-github",
+                "https://www.linkedin.com/in/prem-deshmane01",
+                "https://github.com/premdeshmane-01",
               ],
               alumniOf: {
                 "@type": "CollegeOrUniversity",
-                name: "SNJB College of Engineering",
+                name: "SNJB College of Engineering (SPPU)",
               },
             }),
           }}
