@@ -30,7 +30,7 @@ export default function Hero() {
   // Previously [0, -1200] made the hero move up faster than the user scrolled, creating a gap.
   // changing to [0, -200] creates a nice parallax effect (hero moves slow, content slides over it).
   const heroY = useTransform(scrollY, [0, 900], [0, -200]);
-  
+
   const opacity = useTransform(scrollY, [0, 500], [1, 0.5]);
   const scale = useTransform(scrollY, [0, 300], [1, 1.05]);
 
@@ -75,9 +75,11 @@ export default function Hero() {
     springConfig
   );
 
-  // --- IMAGE STRATEGY ---
-  const desktopSrc = "/yes1.webp";
-  const mobileSrc = "/mobileo.webp"; 
+  // --- IMAGE LOGIC APPLIED HERE ---
+  const desktopSrc = "/yes1.webp"; // Updated to your requested desktop image
+  const mobileSrc = "/mobileo.webp"; // Updated to your requested mobile image
+  
+  // Logic: If screen width (vw) is less than 640px, use mobileSrc, else use desktopSrc
   const usingMobileImage = vw < 640;
   const chosenSrc = usingMobileImage ? mobileSrc : desktopSrc;
 

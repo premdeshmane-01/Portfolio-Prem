@@ -56,6 +56,14 @@ export default function Navbar() {
 
       setIsScrolled(y > 20);
 
+      // --- FIX: Force "Home" when near the top ---
+      // This prevents "About" from activating because the Hero is fixed/parallax
+      if (y < vh * 0.5) {
+        setActiveSection("home");
+        setMenuTheme("glass");
+        return;
+      }
+
       // 1. FOOTER CHECK (Highest Priority)
       if (window.innerHeight + y >= pageHeight - 50) {
         setMenuTheme("glass");
@@ -63,8 +71,9 @@ export default function Navbar() {
       }
 
       // 2. SECTION CHECK
-      const sectionsToCheck = ["contact", "projects", "skills", "about", "home"];
-      let currentId = "home";
+      // "home" is removed from here because we handled it explicitly above
+      const sectionsToCheck = ["contact", "projects", "skills", "about"];
+      let currentId = activeSection; // Default to current to prevent flickering
 
       for (const id of sectionsToCheck) {
         const el = document.getElementById(id);
@@ -86,7 +95,7 @@ export default function Navbar() {
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll(); 
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [activeSection]);
 
   const handleNav = (id: string) => {
     setMenuOpen(false);
@@ -198,10 +207,6 @@ export default function Navbar() {
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-40 lg:hidden"
           >
-            {/* CHANGED HERE: 
-                backdrop-blur-2xl -> backdrop-blur-md 
-                (You can also try 'backdrop-blur-sm' for even less blur)
-            */}
             <div className="absolute inset-0 bg-black/40 backdrop-blur-md" />
 
             <motion.div
