@@ -9,6 +9,16 @@ import {
 import React, { useEffect, useState } from "react";
 import { Linkedin, Github, Mail } from "lucide-react";
 
+// --- CONFIGURATION ---
+// Map your sections to the menu theme they require.
+const SECTION_THEMES: Record<string, "glass" | "solid"> = {
+  home: "glass",
+  about: "glass",
+  skills: "solid",
+  projects: "solid",
+  contact: "solid",
+};
+
 const navItems = [
   { name: "Home", id: "home" },
   { name: "About", id: "about" },
@@ -23,10 +33,13 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isSmall, setIsSmall] = useState(false);
 
+  // Default to 'glass' (Hero style)
+  const [menuTheme, setMenuTheme] = useState<"glass" | "solid">("glass");
+
   const navOpacity = useTransform(scrollY, [0, 50], [1, 1]);
   const navScale = useTransform(scrollY, [0, 50], [1, 0.98]);
 
-  /* ---------- device ---------- */
+  /* ---------- device check ---------- */
   useEffect(() => {
     const onResize = () => setIsSmall(window.innerWidth < 1024);
     onResize();
@@ -34,28 +47,44 @@ export default function Navbar() {
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
-  /* ---------- scroll spy ---------- */
+  /* ---------- scroll spy & theme engine ---------- */
   useEffect(() => {
     const onScroll = () => {
       const y = window.scrollY;
+      const vh = window.innerHeight;
+      const pageHeight = document.body.scrollHeight;
+
       setIsScrolled(y > 20);
 
-      if (y < 100) {
-        setActiveSection("home");
+      // 1. FOOTER CHECK (Highest Priority)
+      if (window.innerHeight + y >= pageHeight - 50) {
+        setMenuTheme("glass");
         return;
       }
 
-      for (const id of ["contact", "projects", "about"]) {
+      // 2. SECTION CHECK
+      const sectionsToCheck = ["contact", "projects", "skills", "about", "home"];
+      let currentId = "home";
+
+      for (const id of sectionsToCheck) {
         const el = document.getElementById(id);
-        if (el && y + 160 >= el.offsetTop) {
-          setActiveSection(id);
-          return;
+        if (el) {
+          if (y >= el.offsetTop - vh * 0.4) {
+            currentId = id;
+            break; 
+          }
         }
       }
+
+      setActiveSection(currentId);
+
+      // 3. APPLY THEME
+      const theme = SECTION_THEMES[currentId] || "glass";
+      setMenuTheme(theme);
     };
 
     window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
+    onScroll(); 
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
@@ -96,7 +125,7 @@ export default function Navbar() {
             }
           `}
         >
-          {/* ---------- DESKTOP ---------- */}
+          {/* ---------- DESKTOP (Untouched) ---------- */}
           <div className="hidden lg:flex items-center gap-2">
             {navItems.map((item) => {
               const active = activeSection === item.id;
@@ -136,20 +165,23 @@ export default function Navbar() {
             <button
               aria-label="Menu"
               onClick={() => setMenuOpen((v) => !v)}
-              className="
+              className={`
                 flex items-center justify-center
                 w-10 h-10 rounded-full
-                bg-white/5 backdrop-blur-md
-                border border-white/20
-                hover:bg-white/10
-                transition-all
+                backdrop-blur-md
+                transition-all duration-500 ease-out
                 active:scale-95
-              "
+                ${
+                  menuTheme === "solid"
+                    ? "bg-black/80 border border-black/10 shadow-lg"
+                    : "bg-white/5 border border-white/20 hover:bg-white/10"
+                }
+              `}
             >
               <img
                 src="/menu-bar.svg"
                 alt="Menu"
-                className="w-5 h-5"
+                className="w-5 h-5 transition-opacity duration-300"
                 style={{ filter: "invert(1)" }}
               />
             </button>
@@ -166,8 +198,11 @@ export default function Navbar() {
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-40 lg:hidden"
           >
-            {/* glass backdrop */}
-            <div className="absolute inset-0 bg-black/40 backdrop-blur-2xl" />
+            {/* CHANGED HERE: 
+                backdrop-blur-2xl -> backdrop-blur-md 
+                (You can also try 'backdrop-blur-sm' for even less blur)
+            */}
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-md" />
 
             <motion.div
               initial={{ y: 40, opacity: 0 }}

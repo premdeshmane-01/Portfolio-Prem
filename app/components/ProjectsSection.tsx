@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { motion, Variants } from "framer-motion";
-import { Github, ArrowUpRight } from "lucide-react";
+import { Github, ArrowUpRight, Layers } from "lucide-react";
 
 export default function ProjectsSection() {
   const [projects, setProjects] = useState<any[]>([]);
@@ -27,95 +27,117 @@ export default function ProjectsSection() {
       opacity: 1,
       y: 0,
       scale: 1,
-      transition: { duration: 0.8, ease: [0.2, 0.65, 0.3, 0.9] }, // Cinematic easing
+      transition: { duration: 0.8, ease: [0.2, 0.65, 0.3, 0.9] },
     },
   };
 
   return (
-    <section id="projects" className="py-20 md:py-32 px-4 md:px-6 relative z-20 bg-[#DEDEDE]">
+    <section 
+      id="projects" 
+      // CHANGED: md:py-24 -> md:pt-24 md:pb-12
+      // This reduces the bottom gap on desktop while keeping the top breathing room.
+      className="py-12 md:pt-24 md:pb-12 px-4 md:px-6 relative z-20 bg-[#DEDEDE]"
+    >
       <div className="max-w-7xl mx-auto">
-        {/* Section Header - unchanged */}
+        
+        {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
+          viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 0.8 }}
-          className="flex flex-col md:flex-row justify-between items-end mb-12 md:mb-24 border-b border-black/5 pb-8 md:pb-10"
+          className="flex flex-col md:flex-row justify-between items-end mb-8 md:mb-20 border-b border-black/5 pb-6 md:pb-10"
         >
-          <div className="space-y-3 md:space-y-4">
-            <span className="text-xs font-bold tracking-[0.2em] text-gray-500 uppercase">// Selected Works</span>
-            <h2 className="text-3xl md:text-5xl lg:text-7xl font-medium text-black tracking-tight">
-              Curated <span className="text-gray-400 font-light italic">Projects</span>
+          <div className="space-y-2 md:space-y-4">
+            <div className="inline-flex items-center gap-2 px-2 py-1 rounded border border-black/5 bg-white/50 backdrop-blur-sm">
+                <Layers size={10} className="text-emerald-600" />
+                <span className="text-[10px] font-bold tracking-[0.2em] text-gray-500 uppercase">Selected Works</span>
+            </div>
+            <h2 className="text-3xl md:text-5xl lg:text-7xl font-medium text-black tracking-tight leading-tight">
+              Curated <span className="text-gray-400 font-light italic">Excellence</span>
             </h2>
           </div>
 
-          <p className="text-gray-600 max-w-xs text-right text-sm font-medium leading-relaxed mt-4 md:mt-0">
-            A collection of digital experiences crafted with precision, performance, and passion.
+          <p className="text-gray-600 max-w-xs text-left md:text-right text-xs md:text-sm font-medium leading-relaxed mt-4 md:mt-0">
+            Digital experiences crafted with pixel-perfect precision and engineering depth.
           </p>
         </motion.div>
 
-        {/* ---------------- MOBILE: compact list (visible on small screens only) ---------------- */}
-        <div className="md:hidden space-y-4">
+        {/* ---------------- MOBILE: Immersive Poster Carousel ---------------- */}
+        <div className="md:hidden flex overflow-x-auto gap-4 pb-8 -mx-4 px-4 snap-x snap-mandatory hide-scrollbar">
           {projects.map((project) => (
-            <article key={project.id} className="flex items-center gap-4 bg-white rounded-xl p-3 shadow-sm border border-black/6">
-              {/* thumbnail */}
-              <div className="flex-shrink-0 w-20 h-14 rounded-lg overflow-hidden bg-gray-200">
+            <div 
+              key={project.id} 
+              className="relative snap-center flex-shrink-0 w-[85vw] max-w-[340px] aspect-[4/5] rounded-[2rem] overflow-hidden shadow-xl shadow-black/10 border border-white/20"
+            >
+              {/* Full Background Image */}
+              <div className="absolute inset-0 bg-gray-900">
                 <img
                   src={project.image || "/placeholder.jpg"}
                   alt={project.title}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover opacity-90"
                 />
+                {/* Cinematic Dark Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
               </div>
 
-              {/* content */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-baseline justify-between gap-3">
-                  <h3 className="text-sm font-semibold text-black truncate">{project.title}</h3>
-                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{project.category}</span>
+              {/* Content Overlay */}
+              <div className="absolute inset-0 p-6 flex flex-col justify-end">
+                
+                {/* Category Badge */}
+                <div className="mb-auto">
+                    <span className="inline-block px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-[10px] font-bold uppercase tracking-wider text-white/80">
+                        {project.category}
+                    </span>
                 </div>
 
-                <p className="text-xs text-gray-600 mt-1 truncate">{project.description}</p>
+                <div className="space-y-3">
+                    <h3 className="text-2xl font-bold text-white leading-tight">
+                        {project.title}
+                    </h3>
+                    
+                    <p className="text-xs text-white/70 line-clamp-2 leading-relaxed font-light">
+                        {project.description}
+                    </p>
 
-                <div className="mt-2 flex items-center justify-between gap-3">
-                  <div className="flex gap-2">
-                    {Array.isArray(project.techStack) &&
-                      project.techStack.slice(0, 3).map((t: string) => (
-                        <span key={t} className="text-[10px] px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">
-                          {t}
-                        </span>
-                      ))}
-                  </div>
+                    {/* Glassmorphic Tags */}
+                    <div className="flex flex-wrap gap-1.5 pt-1">
+                        {Array.isArray(project.techStack) &&
+                            project.techStack.slice(0, 3).map((t: string) => (
+                            <span key={t} className="px-2 py-1 rounded-md bg-white/10 backdrop-blur-sm border border-white/5 text-[10px] text-white/90 font-medium">
+                                {t}
+                            </span>
+                        ))}
+                    </div>
 
-                  <div className="flex items-center gap-2">
-                    <a
-                      href={project.githubLink || "#"}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="p-1.5 rounded-md bg-white/90 border border-black/6 shadow-sm hover:bg-black hover:text-white transition-colors text-black"
-                      title="View Code"
-                    >
-                      <Github size={14} strokeWidth={1.6} />
-                    </a>
-
-                    {project.liveLink && project.liveLink !== "#" && (
-                      <a
-                        href={project.liveLink}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="p-1.5 rounded-md bg-white/90 border border-black/6 shadow-sm hover:bg-[#00C853] hover:text-white transition-colors text-black"
-                        title="Live Demo"
-                      >
-                        <ArrowUpRight size={14} strokeWidth={1.6} />
-                      </a>
-                    )}
-                  </div>
+                    {/* Action Buttons */}
+                    <div className="flex gap-3 pt-4">
+                        <a
+                            href={project.githubLink || "#"}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="flex-1 py-3 rounded-xl bg-white/10 backdrop-blur-md border border-white/10 flex items-center justify-center gap-2 text-white text-xs font-bold uppercase tracking-wide hover:bg-white hover:text-black transition-all"
+                        >
+                            <Github size={16} /> Code
+                        </a>
+                        {project.liveLink && project.liveLink !== "#" && (
+                            <a
+                            href={project.liveLink}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="flex-1 py-3 rounded-xl bg-white text-black flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wide hover:bg-emerald-400 transition-colors"
+                            >
+                            Demo <ArrowUpRight size={16} />
+                            </a>
+                        )}
+                    </div>
                 </div>
               </div>
-            </article>
+            </div>
           ))}
         </div>
 
-        {/* ---------------- DESKTOP: original cinematic grid (unchanged, visible md+) ---------------- */}
+        {/* ---------------- DESKTOP: Cinematic Grid ---------------- */}
         <motion.div
           className="hidden md:grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-32"
           variants={containerVariants}

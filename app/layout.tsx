@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
 
   title: {
-    default: "Premsagar Deshmane | Computer Engineering Student & Frontend Engineer",
+    default: "Premsagar Deshmane ",
     template: "%s | Premsagar Deshmane",
   },
 

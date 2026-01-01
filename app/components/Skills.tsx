@@ -4,166 +4,213 @@ import { motion, useInView } from "framer-motion";
 import { useRef, useState } from "react";
 import { ChevronDown } from "lucide-react";
 
-/* ---------- keep your original skills data ---------- */
+/* ---------- Skills Data ---------- */
 const skills = [
-  { category: "Frontend Engineering", items: ["React", "Next.js", "Tailwind CSS", "GSAP", "Three.js"], icon: "⚡" },
-  { category: "Backend Architecture", items: ["Node.js", "Express", "MongoDB", "PostgreSQL"], icon: "⚙️" },
-  { category: "AI & Machine Learning", items: ["Python", "TensorFlow", "OpenAI API", "RAG Pipelines"], icon: "🧠" },
-  { category: "DevOps & Tools", items: ["Git/GitHub", "Figma", "Docker", "Vercel"], icon: "🛠️" },
+  {
+    category: "Modern Frontend Engineering",
+    items: ["React & React Native", "Next.js (App Router)", "TypeScript", "Tailwind & Shadcn UI", "Framer Motion", "GSAP"],
+    icon: "⚡",
+    description: "Crafting pixel-perfect, accessible, and high-performance interfaces that delight users."
+  },
+  {
+    category: "Scalable Backend Systems",
+    items: ["Node.js", "Express", "PostgreSQL & Prisma", "MongoDB", "Serverless Functions", "REST & GraphQL"],
+    icon: "⚙️",
+    description: "Architecting robust APIs and databases optimized for speed, security, and reliability."
+  },
+  {
+    category: "AI Engineering & Integration",
+    items: ["Python", "OpenAI API", "LangChain", "RAG Systems", "Vector Databases", "Prompt Engineering"],
+    icon: "🧠",
+    description: "Bridging the gap between software and intelligence to build adaptive, smart applications."
+  },
+  {
+    category: "DevOps & Cloud Infrastructure",
+    items: ["Git & GitHub Actions", "Docker", "AWS (EC2, S3)", "Vercel & Netlify", "CI/CD Pipelines"],
+    icon: "🛠️",
+    description: "Automating workflows and ensuring seamless deployment from development to production."
+  }
 ];
 
-type SkillGroupType = { category: string; items: string[]; icon: string };
+type SkillGroupType = { category: string; items: string[]; icon: string; description: string };
 
-/* ---------- Desktop card - unchanged visuals (kept identical) ---------- */
+
+/* ---------- Desktop Card (Compacted) ---------- */
 function DesktopSkillCard({ skillGroup, index }: { skillGroup: SkillGroupType; index: number }) {
   const ref = useRef<HTMLDivElement | null>(null);
-  const isInView = useInView(ref, { once: true, margin: "-80px" });
+  const isInView = useInView(ref, { once: true, margin: "-50px" });
 
   return (
     <motion.article
       ref={ref}
       role="group"
       aria-labelledby={`skill-${index}`}
-      initial={{ opacity: 0, y: 24 }}
+      initial={{ opacity: 0, y: 20 }}
       animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.6, delay: index * 0.08, ease: [0.2, 0.8, 0.2, 1] }}
-      whileHover={{ y: -8, boxShadow: "0 12px 30px rgba(0,0,0,0.12)" }}
-      className="relative overflow-hidden bg-white/60 backdrop-blur-sm p-6 md:p-8 rounded-2xl border border-black/6 transition-all duration-300 focus-within:shadow-lg"
-      tabIndex={-1}
+      transition={{ duration: 0.4, delay: index * 0.1, ease: "easeOut" }}
+      whileHover={{ y: -4, boxShadow: "0 15px 30px -10px rgba(0,0,0,0.1)" }}
+      // CHANGED: Reduced padding (p-5 lg:p-6) for height efficiency
+      className="relative overflow-hidden bg-white rounded-xl border border-gray-100 p-5 lg:p-6 shadow-sm transition-all duration-300 group"
     >
-      <div className="pointer-events-none absolute -top-8 -right-10 w-36 h-36 rounded-full bg-black/[0.02] blur-2xl hidden md:block" />
-      <header className="relative z-10 flex items-start justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <div aria-hidden className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-black/5 to-black/10 text-2xl">
-            <span className="select-none">{skillGroup.icon}</span>
-          </div>
+      <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-gray-100 to-transparent rounded-bl-full opacity-50 transition-transform group-hover:scale-110" />
 
+      {/* Header: Reduced margins and icon sizes */}
+      <header className="relative z-10 flex items-start justify-between mb-3 lg:mb-4">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center justify-center w-10 h-10 lg:w-12 lg:h-12 rounded-xl bg-gray-50 text-xl lg:text-2xl shadow-inner border border-gray-100 group-hover:bg-white group-hover:shadow-md transition-all duration-300">
+            {skillGroup.icon}
+          </div>
           <div>
-            <h3 id={`skill-${index}`} className="text-sm md:text-base font-semibold text-black">
+            <h3 id={`skill-${index}`} className="text-sm lg:text-base font-bold text-gray-900 leading-tight">
               {skillGroup.category}
             </h3>
-            <p className="text-xs text-black/50 mt-1 max-w-[22rem]">{skillGroup.items.length} key skills</p>
+            <p className="text-[9px] lg:text-[10px] font-medium text-emerald-600 mt-0.5 uppercase tracking-wide">
+              Production Ready
+            </p>
           </div>
         </div>
-
-        <div className="text-3xl font-extrabold text-black/[0.06] md:text-4xl select-none">{`0${index + 1}`}</div>
+        {/* Smaller number font */}
+        <div className="text-3xl lg:text-4xl font-black text-gray-100 select-none group-hover:text-gray-200 transition-colors">
+          0{index + 1}
+        </div>
       </header>
 
-      <div className="relative z-10 mt-4 md:mt-6 flex flex-wrap gap-2.5">
+      {/* Skill Tags: Tighter gap and smaller padding */}
+      <div className="relative z-10 flex flex-wrap gap-1.5 lg:gap-2 mb-3 lg:mb-4">
         {skillGroup.items.map((item, i) => (
           <motion.span
             key={item}
-            initial={{ opacity: 0, scale: 0.92 }}
+            initial={{ opacity: 0, scale: 0.9 }}
             animate={isInView ? { opacity: 1, scale: 1 } : {}}
-            transition={{ delay: 0.15 + index * 0.06 + i * 0.03, type: "spring", stiffness: 260, damping: 24 }}
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/80 border border-black/6 text-sm font-medium text-black/80 hover:bg-black hover:text-white transition-colors duration-200"
+            transition={{ delay: 0.2 + (i * 0.05) }}
+            whileHover={{ scale: 1.05 }}
+            className="inline-flex items-center px-2 py-1 rounded bg-gray-50 border border-gray-200 text-[10px] lg:text-xs font-medium text-gray-700 hover:bg-gray-900 hover:text-white hover:border-gray-900 transition-colors cursor-default"
           >
-            <span className="text-xs opacity-80">•</span>
-            <span className="truncate max-w-[8rem]">{item}</span>
+            {item}
           </motion.span>
         ))}
       </div>
 
-      <p className="mt-4 text-xs text-black/50 hidden md:block">Focused on building production-ready systems—clean code, scalable architecture and thoughtful UX.</p>
+      <p className="relative z-10 text-[11px] lg:text-xs text-gray-500 leading-relaxed group-hover:text-gray-700 transition-colors line-clamp-2">
+        {skillGroup.description}
+      </p>
+
     </motion.article>
   );
 }
 
-/* ---------- Mobile: improved single-open accordion with polished UI ---------- */
+
+/* ---------- Mobile Accordion ---------- */
 function MobileAccordion({ skillGroup, index, openIndex, setOpenIndex }: { skillGroup: SkillGroupType; index: number; openIndex: number | null; setOpenIndex: (idx: number | null) => void; }) {
   const isOpen = openIndex === index;
+
   return (
-    <div className="w-full">
+    <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden transition-all duration-300">
       <button
-        aria-expanded={isOpen}
-        aria-controls={`skill-panel-${index}`}
         onClick={() => setOpenIndex(isOpen ? null : index)}
-        className="w-full flex items-center justify-between gap-4 p-3 rounded-xl bg-white/95 border border-black/6 shadow-sm hover:shadow-md transition"
+        className="w-full flex items-center justify-between p-3.5 bg-white active:bg-gray-50 transition-colors"
       >
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-black/[0.04] flex items-center justify-center text-lg">{skillGroup.icon}</div>
+          <span className="text-xl">{skillGroup.icon}</span>
           <div className="text-left">
-            <div className="text-sm font-semibold text-black">{skillGroup.category}</div>
-            <div className="text-xs text-black/50">{skillGroup.items.length} skills</div>
+            <div className="font-bold text-gray-900 text-sm">{skillGroup.category}</div>
+            <div className="text-[10px] text-gray-500">{skillGroup.items.length} Technologies</div>
           </div>
         </div>
-
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-black/50 mr-2 hidden sm:inline">{isOpen ? "Collapse" : "Expand"}</span>
-          <motion.span
-            animate={{ rotate: isOpen ? 180 : 0 }}
-            transition={{ duration: 0.25 }}
-            className="text-black/60"
-          >
-            <ChevronDown size={18} />
-          </motion.span>
-        </div>
+        <motion.div
+          animate={{ rotate: isOpen ? 180 : 0 }}
+          transition={{ duration: 0.2 }}
+          className="text-gray-400"
+        >
+          <ChevronDown size={18} />
+        </motion.div>
       </button>
 
       <div
-        id={`skill-panel-${index}`}
-        role="region"
-        aria-labelledby={`skill-${index}`}
-        className={`overflow-hidden transition-[max-height] duration-300 ease-in-out ${isOpen ? "max-h-[480px] mt-3" : "max-h-0"}`}
+        className={`overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"}`}
       >
-        <div className="p-3 bg-white/95 border border-t-0 border-black/6 rounded-b-xl">
-          <div className="flex flex-wrap gap-2">
-            {skillGroup.items.map((t) => (
-              <span key={t} className="text-xs px-3 py-1 rounded-full bg-black/[0.05] text-black/80">
-                {t}
+        <div className="p-3.5 pt-0 bg-gray-50/50 border-t border-gray-100">
+          <div className="flex flex-wrap gap-2 mt-2">
+            {skillGroup.items.map((item) => (
+              <span key={item} className="px-2 py-0.5 bg-white border border-gray-200 rounded text-[10px] font-medium text-gray-600 shadow-sm">
+                {item}
               </span>
             ))}
           </div>
-          <p className="mt-3 text-xs text-black/50">Experience building production systems with these tools. Tap to view details (desktop shows richer cards).</p>
+          <p className="mt-3 text-[10px] text-gray-500 italic leading-relaxed border-l-2 border-emerald-500 pl-2">
+             "{skillGroup.description}"
+          </p>
         </div>
       </div>
     </div>
   );
 }
 
-/* ---------- Final exported component: desktop unchanged, mobile improved ---------- */
+
 export default function Skills() {
   const headerRef = useRef<HTMLDivElement | null>(null);
-  const isHeaderInView = useInView(headerRef, { once: true });
-  const [openIndex, setOpenIndex] = useState<number | null>(0); // open first by default for mobile
+  const isInView = useInView(headerRef, { once: true });
+  const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   return (
-    <section className="relative z-10 overflow-hidden bg-[#F3F3F3] py-16 md:py-28 px-4 md:px-12">
-      <div className="relative max-w-7xl mx-auto">
-        {/* Header (keeps your desktop look) */}
-        <div ref={headerRef} className="mb-8 md:mb-16">
-          <div className="flex items-center gap-4 mb-4" aria-hidden>
-            <div className="h-px w-12 bg-gradient-to-r from-transparent to-black/20" />
-            <span className="text-xs font-medium uppercase tracking-wider text-black/50">Technical Arsenal</span>
-            <div className="h-px flex-1 bg-gradient-to-r from-black/20 to-transparent" />
-          </div>
+    <section 
+      id="skills" 
+      // CHANGED: py-10 to fit tight vertical spaces.
+      className="relative z-10 min-h-screen w-full flex flex-col justify-center overflow-hidden bg-[#FAFAFA] py-10 lg:py-12 px-4 md:px-8 lg:px-12"
+    > 
+      
+      <div className="absolute inset-0 pointer-events-none opacity-[0.03]" 
+           style={{ backgroundImage: 'radial-gradient(#000 1px, transparent 1px)', backgroundSize: '24px 24px' }} 
+      />
 
-          <div>
-            <h2 className="text-3xl md:text-5xl lg:text-6xl font-extrabold text-black tracking-tight leading-tight">
-              CORE <span className="font-black text-black/30">COMPETENCIES</span>
-            </h2>
-            <p className="mt-3 text-sm md:text-base text-black/60 max-w-2xl">
-              A concise toolkit spanning frontend, backend, ML, and DevOps—focused on scalable, production-ready systems.
-            </p>
-          </div>
+      <div className="relative max-w-6xl mx-auto w-full">
+        
+        {/* Header Section: Reduced margins (mb-6) */}
+        <div ref={headerRef} className="mb-6 lg:mb-10 text-center md:text-left">
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6 }}
+            className="inline-flex items-center gap-2 mb-2 px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-700 text-[10px] font-bold uppercase tracking-wider"
+          >
+             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"/>
+             Technical Arsenal
+          </motion.div>
+          
+          <motion.h2 
+            initial={{ opacity: 0, y: 10 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            // Smaller heading
+            className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-900 tracking-tight mb-2"
+          >
+            Engineering <span className="text-transparent bg-clip-text bg-gradient-to-r from-gray-900 via-gray-600 to-gray-400">Versatility.</span>
+          </motion.h2>
+
+          <motion.p 
+            initial={{ opacity: 0, y: 10 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="text-sm md:text-base lg:text-lg text-gray-600 max-w-xl leading-relaxed mx-auto md:mx-0"
+          >
+            I don't just write code; I build solutions. Adapting pixel-perfect frontends to scalable backends and AI.
+          </motion.p>
         </div>
 
-        {/* MOBILE: single-column accordion (visible < md) */}
+        {/* Mobile View */}
         <div className="md:hidden space-y-3">
           {skills.map((s, i) => (
             <MobileAccordion key={s.category} skillGroup={s} index={i} openIndex={openIndex} setOpenIndex={setOpenIndex} />
           ))}
         </div>
 
-        {/* DESKTOP: original grid (visible md+) - preserved look */}
-        <div className="hidden md:grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 md:gap-8">
+        {/* Desktop View: Tighter gap (gap-4) */}
+        <div className="hidden md:grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-5">
           {skills.map((s, i) => (
             <DesktopSkillCard key={s.category} skillGroup={s} index={i} />
           ))}
         </div>
 
-        {/* Accent divider */}
-        <motion.div initial={{ scaleX: 0 }} whileInView={{ scaleX: 1 }} viewport={{ once: true }} transition={{ duration: 0.9, delay: 0.25 }} className="mt-12 md:mt-20 h-[1px] w-full bg-gradient-to-r from-transparent via-black/10 to-transparent origin-center" aria-hidden />
       </div>
     </section>
   );
