@@ -41,7 +41,17 @@ export async function GET() {
       githubLink: "https://github.com/premdeshmane-01/SideCup_Family_Golf",
       liveLink: "https://premdeshmane-01.github.io/SideCup_Family_Golf/",
       image: "/projects/sidcup.png" // UPDATED to .png
-    }
+    },
+    {
+  "id": "wolf-3d-clone",
+  "title": "3D Wolf Experience",
+  "category": "WebGL / Interactive",
+  "description": "A visually immersive clone of the Dogstudio website featuring a reactive 3D wolf model. Built to demonstrate high-performance WebGL rendering and interactive particle effects.",
+  "image": "/projects/wolf.png",
+  "techStack": ["React", "Three.js", "React Three Fiber", "Tailwind"],
+  "githubLink": "https://github.com/premdeshmane-01/3d_wolfie",
+  "liveLink": "https://wolf3d-5uz8h9joj-premdeshmane-01s-projects.vercel.app/"
+}
   ];
 
   return NextResponse.json(projects);
