@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useInView } from "framer-motion";
+import { motion, useInView, AnimatePresence } from "framer-motion";
 import { useRef, useState } from "react";
 import { ChevronDown } from "lucide-react";
 
@@ -35,7 +35,7 @@ const skills = [
 type SkillGroupType = { category: string; items: string[]; icon: string; description: string };
 
 
-/* ---------- Desktop Card (Compacted) ---------- */
+/* ---------- Desktop Card (UNTOUCHED - EXACTLY AS PROVIDED) ---------- */
 function DesktopSkillCard({ skillGroup, index }: { skillGroup: SkillGroupType; index: number }) {
   const ref = useRef<HTMLDivElement | null>(null);
   const isInView = useInView(ref, { once: true, margin: "-50px" });
@@ -49,12 +49,10 @@ function DesktopSkillCard({ skillGroup, index }: { skillGroup: SkillGroupType; i
       animate={isInView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.4, delay: index * 0.1, ease: "easeOut" }}
       whileHover={{ y: -4, boxShadow: "0 15px 30px -10px rgba(0,0,0,0.1)" }}
-      // CHANGED: Reduced padding (p-5 lg:p-6) for height efficiency
       className="relative overflow-hidden bg-white rounded-xl border border-gray-100 p-5 lg:p-6 shadow-sm transition-all duration-300 group"
     >
       <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-gray-100 to-transparent rounded-bl-full opacity-50 transition-transform group-hover:scale-110" />
 
-      {/* Header: Reduced margins and icon sizes */}
       <header className="relative z-10 flex items-start justify-between mb-3 lg:mb-4">
         <div className="flex items-center gap-3">
           <div className="flex items-center justify-center w-10 h-10 lg:w-12 lg:h-12 rounded-xl bg-gray-50 text-xl lg:text-2xl shadow-inner border border-gray-100 group-hover:bg-white group-hover:shadow-md transition-all duration-300">
@@ -69,13 +67,11 @@ function DesktopSkillCard({ skillGroup, index }: { skillGroup: SkillGroupType; i
             </p>
           </div>
         </div>
-        {/* Smaller number font */}
         <div className="text-3xl lg:text-4xl font-black text-gray-100 select-none group-hover:text-gray-200 transition-colors">
           0{index + 1}
         </div>
       </header>
 
-      {/* Skill Tags: Tighter gap and smaller padding */}
       <div className="relative z-10 flex flex-wrap gap-1.5 lg:gap-2 mb-3 lg:mb-4">
         {skillGroup.items.map((item, i) => (
           <motion.span
@@ -94,54 +90,73 @@ function DesktopSkillCard({ skillGroup, index }: { skillGroup: SkillGroupType; i
       <p className="relative z-10 text-[11px] lg:text-xs text-gray-500 leading-relaxed group-hover:text-gray-700 transition-colors line-clamp-2">
         {skillGroup.description}
       </p>
-
     </motion.article>
   );
 }
 
 
-/* ---------- Mobile Accordion ---------- */
+/* ---------- Mobile Accordion (RE-STYLED TO MATCH THEME) ---------- */
 function MobileAccordion({ skillGroup, index, openIndex, setOpenIndex }: { skillGroup: SkillGroupType; index: number; openIndex: number | null; setOpenIndex: (idx: number | null) => void; }) {
   const isOpen = openIndex === index;
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden transition-all duration-300">
+    <div className={`relative overflow-hidden rounded-xl border transition-all duration-500 ${isOpen ? 'border-emerald-200 shadow-lg' : 'border-gray-200 bg-white'}`}>
+      {/* Mirror Desktop Visuals (Gradient Corner + Large Number) */}
+      <div className={`absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-emerald-50 to-transparent rounded-bl-full opacity-40 transition-opacity ${isOpen ? 'opacity-100' : 'opacity-0'}`} />
+      <div className={`absolute top-1 right-3 text-2xl font-black transition-colors ${isOpen ? 'text-emerald-100' : 'text-gray-50'}`}>
+        0{index + 1}
+      </div>
+
       <button
         onClick={() => setOpenIndex(isOpen ? null : index)}
-        className="w-full flex items-center justify-between p-3.5 bg-white active:bg-gray-50 transition-colors"
+        className="relative z-10 w-full flex items-center justify-between p-4 active:bg-gray-50 transition-colors"
       >
-        <div className="flex items-center gap-3">
-          <span className="text-xl">{skillGroup.icon}</span>
+        <div className="flex items-center gap-4">
+          <div className={`flex items-center justify-center w-11 h-11 rounded-xl shadow-inner border border-gray-100 transition-all ${isOpen ? 'bg-white shadow-emerald-100' : 'bg-gray-50'}`}>
+            <span className="text-xl">{skillGroup.icon}</span>
+          </div>
           <div className="text-left">
-            <div className="font-bold text-gray-900 text-sm">{skillGroup.category}</div>
-            <div className="text-[10px] text-gray-500">{skillGroup.items.length} Technologies</div>
+            <div className={`font-bold text-sm transition-colors ${isOpen ? 'text-emerald-900' : 'text-gray-900'}`}>{skillGroup.category}</div>
+            <div className="text-[10px] font-bold text-emerald-600 uppercase tracking-tighter">System Module 0{index + 1}</div>
           </div>
         </div>
         <motion.div
-          animate={{ rotate: isOpen ? 180 : 0 }}
-          transition={{ duration: 0.2 }}
-          className="text-gray-400"
+          animate={{ rotate: isOpen ? 180 : 0, scale: isOpen ? 1.2 : 1 }}
+          className={isOpen ? "text-emerald-500" : "text-gray-400"}
         >
           <ChevronDown size={18} />
         </motion.div>
       </button>
 
-      <div
-        className={`overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"}`}
-      >
-        <div className="p-3.5 pt-0 bg-gray-50/50 border-t border-gray-100">
-          <div className="flex flex-wrap gap-2 mt-2">
-            {skillGroup.items.map((item) => (
-              <span key={item} className="px-2 py-0.5 bg-white border border-gray-200 rounded text-[10px] font-medium text-gray-600 shadow-sm">
-                {item}
-              </span>
-            ))}
-          </div>
-          <p className="mt-3 text-[10px] text-gray-500 italic leading-relaxed border-l-2 border-emerald-500 pl-2">
-             "{skillGroup.description}"
-          </p>
-        </div>
-      </div>
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ type: "spring", duration: 0.5, bounce: 0.3 }}
+          >
+            <div className="p-4 pt-0 relative z-10">
+              <div className="flex flex-wrap gap-2 mt-2">
+                {skillGroup.items.map((item, i) => (
+                  <motion.span 
+                    key={item}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: i * 0.05 }}
+                    className="px-2.5 py-1 bg-white border border-gray-100 rounded-md text-[10px] font-bold text-gray-700 shadow-sm"
+                  >
+                    {item}
+                  </motion.span>
+                ))}
+              </div>
+              <p className="mt-4 text-[11px] text-gray-500 italic leading-relaxed border-l-2 border-emerald-500 pl-3">
+                 {skillGroup.description}
+              </p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -155,25 +170,23 @@ export default function Skills() {
   return (
     <section 
       id="skills" 
-      // CHANGED: py-10 to fit tight vertical spaces.
-      className="relative z-10 min-h-screen w-full flex flex-col justify-center overflow-hidden bg-[#FAFAFA] py-10 lg:py-12 px-4 md:px-8 lg:px-12"
+      className="relative z-10 min-h-screen w-full flex flex-col justify-center overflow-hidden bg-[#FAFAFA] py-16 lg:py-24 px-6 md:px-12"
     > 
-      
       <div className="absolute inset-0 pointer-events-none opacity-[0.03]" 
-           style={{ backgroundImage: 'radial-gradient(#000 1px, transparent 1px)', backgroundSize: '24px 24px' }} 
+           style={{ backgroundImage: 'radial-gradient(#000 1px, transparent 1px)', backgroundSize: '30px 30px' }} 
       />
 
       <div className="relative max-w-6xl mx-auto w-full">
         
-        {/* Header Section: Reduced margins (mb-6) */}
-        <div ref={headerRef} className="mb-6 lg:mb-10 text-center md:text-left">
+        {/* Header Section */}
+        <div ref={headerRef} className="mb-12 lg:mb-16 text-center md:text-left">
           <motion.div 
             initial={{ opacity: 0, y: 10 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6 }}
-            className="inline-flex items-center gap-2 mb-2 px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-700 text-[10px] font-bold uppercase tracking-wider"
+            className="inline-flex items-center gap-2 mb-3 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-700 text-[11px] font-black uppercase tracking-widest"
           >
-             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"/>
+             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"/>
              Technical Arsenal
           </motion.div>
           
@@ -181,30 +194,29 @@ export default function Skills() {
             initial={{ opacity: 0, y: 10 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.1 }}
-            // Smaller heading
-            className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-900 tracking-tight mb-2"
+            className="text-4xl md:text-5xl lg:text-7xl font-extrabold text-gray-900 tracking-tighter mb-4"
           >
-            Engineering <span className="text-transparent bg-clip-text bg-gradient-to-r from-gray-900 via-gray-600 to-gray-400">Versatility.</span>
+            Engineering <span className="text-transparent bg-clip-text bg-gradient-to-r from-gray-900 via-emerald-800 to-gray-500">Versatility.</span>
           </motion.h2>
 
           <motion.p 
             initial={{ opacity: 0, y: 10 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-sm md:text-base lg:text-lg text-gray-600 max-w-xl leading-relaxed mx-auto md:mx-0"
+            className="text-sm md:text-base lg:text-lg text-gray-500 max-w-2xl leading-relaxed mx-auto md:mx-0"
           >
-            I don't just write code; I build solutions. Adapting pixel-perfect frontends to scalable backends and AI.
+            Building high-performance solutions across the stack, from pixel-perfect interfaces to AI-driven backend architectures.
           </motion.p>
         </div>
 
         {/* Mobile View */}
-        <div className="md:hidden space-y-3">
+        <div className="md:hidden space-y-4">
           {skills.map((s, i) => (
             <MobileAccordion key={s.category} skillGroup={s} index={i} openIndex={openIndex} setOpenIndex={setOpenIndex} />
           ))}
         </div>
 
-        {/* Desktop View: Tighter gap (gap-4) */}
+        {/* Desktop View: UNTOUCHED GAP & GRID */}
         <div className="hidden md:grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-5">
           {skills.map((s, i) => (
             <DesktopSkillCard key={s.category} skillGroup={s} index={i} />

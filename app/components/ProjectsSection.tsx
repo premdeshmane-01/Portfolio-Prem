@@ -1,28 +1,41 @@
 "use client";
 import { useEffect, useState } from "react";
-import { motion, Variants } from "framer-motion";
-import { Github, ArrowUpRight, Layers } from "lucide-react";
+import { motion, Variants, AnimatePresence } from "framer-motion";
+import { Github, ArrowUpRight, Layers, Sparkles } from "lucide-react";
+
+// --- UTILITY: Noise Background for Texture ---
+const NoiseBackground = () => (
+  <div className="absolute inset-0 z-0 opacity-[0.03] pointer-events-none mix-blend-overlay">
+    <svg width="100%" height="100%">
+      <filter id="pedigree-noise">
+        <feTurbulence
+          type="fractalNoise"
+          baseFrequency="0.80"
+          numOctaves="4"
+          stitchTiles="stitch"
+        />
+      </filter>
+      <rect width="100%" height="100%" filter="url(#pedigree-noise)" />
+    </svg>
+  </div>
+);
 
 // --- UPDATED SUB-COMPONENT: ProjectCard ---
 function ProjectCard({ project, index, variants }: any) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [isHovered, setIsHovered] = useState(false); // Track if mouse is over card
+  const [isHovered, setIsHovered] = useState(false);
   const hasMultipleImages = project.images && project.images.length > 1;
 
   useEffect(() => {
-    // STRICT RULE: Do not run timer if not hovering
     if (!hasMultipleImages || !isHovered) return;
-
     const interval = setInterval(() => {
       setCurrentImageIndex((prev) =>
         prev === project.images.length - 1 ? 0 : prev + 1
       );
-    }, 3000); // <--- EXACTLY 3 SECONDS
-
+    }, 3000); // 3 Seconds
     return () => clearInterval(interval);
   }, [hasMultipleImages, project.images, isHovered]);
 
-  // When mouse leaves, stop everything and reset to cover image
   const handleMouseLeave = () => {
     setIsHovered(false);
     setCurrentImageIndex(0);
@@ -31,99 +44,102 @@ function ProjectCard({ project, index, variants }: any) {
   return (
     <motion.div
       variants={variants}
-      className={`group flex flex-col gap-6 ${
+      className={`group relative flex flex-col gap-5 ${
         index < 2 ? "md:col-span-3" : "md:col-span-2"
       }`}
-      // 1. START HOVER TRACKING
       onMouseEnter={() => setIsHovered(true)}
-      // 2. STOP HOVER TRACKING
       onMouseLeave={handleMouseLeave}
     >
       {/* Cinematic Image Container */}
       <div
-        className={`relative w-full overflow-hidden rounded-2xl bg-gray-200 shadow-sm group-hover:shadow-2xl transition-all duration-700 ease-out ${
+        className={`relative w-full overflow-hidden rounded-[2rem] bg-gray-100 border border-white/20 shadow-sm transition-all duration-700 ease-[0.22,1,0.36,1] group-hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.15)] ${
           index < 2 ? "aspect-[16/9]" : "aspect-[4/3]"
         }`}
       >
-        {/* IMAGE LOGIC: Stacked images with Opacity transition */}
-        {hasMultipleImages ? (
-          project.images.map((img: string, idx: number) => (
-            <motion.img
-              key={img}
-              src={img}
-              alt={`${project.title} - view ${idx + 1}`}
-              initial={false}
-              animate={{
-                // Only show the current index.
-                opacity: idx === currentImageIndex ? 1 : 0,
-                // Keep the visible image on top of the fading-out one
-                zIndex: idx === currentImageIndex ? 10 : 1,
-              }}
-              // Smooth 1.2s crossfade. 
-              // Since interval is 3s, you get: 1.2s fade -> 1.8s static -> repeat.
-              transition={{ duration: 1.2, ease: "easeInOut" }} 
+        {/* Image Wrapper for Scaling Effect */}
+        <div className="relative w-full h-full transition-transform duration-1000 ease-out group-hover:scale-105">
+          {hasMultipleImages ? (
+            <AnimatePresence mode="popLayout">
+              {project.images.map((img: string, idx: number) => (
+                <motion.img
+                  key={`${img}-${idx}`}
+                  src={img}
+                  alt={`${project.title} - view ${idx + 1}`}
+                  initial={false}
+                  animate={{
+                    opacity: idx === currentImageIndex ? 1 : 0,
+                    zIndex: idx === currentImageIndex ? 10 : 1,
+                  }}
+                  transition={{ duration: 0.8, ease: "easeInOut" }}
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+              ))}
+            </AnimatePresence>
+          ) : (
+            <img
+              src={project.image || "/placeholder.jpg"}
+              alt={project.title}
               className="absolute inset-0 w-full h-full object-cover"
             />
-          ))
-        ) : (
-          <img
-            src={project.image || "/placeholder.jpg"}
-            alt={project.title}
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-        )}
+          )}
+        </div>
 
-        {/* Soft Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-20" />
+        {/* Cinematic Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-20" />
 
-        {/* Action Buttons */}
-        <div className="absolute bottom-5 right-5 flex gap-2 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 delay-100 z-30">
+        {/* Floating Action Buttons */}
+        <div className="absolute top-4 right-4 flex gap-3 z-30 translate-y-[-10px] opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 ease-out">
           <a
             href={project.githubLink}
             target="_blank"
             rel="noreferrer"
-            className="p-2.5 bg-white/90 backdrop-blur-sm rounded-full text-black hover:bg-black hover:text-white transition-all duration-300 shadow-lg"
+            className="p-3 bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-white hover:bg-white hover:text-black transition-all duration-300"
+            title="View Source"
           >
-            <Github size={16} strokeWidth={2} />
+            <Github size={18} />
           </a>
           {project.liveLink && project.liveLink !== "#" && (
             <a
               href={project.liveLink}
               target="_blank"
               rel="noreferrer"
-              className="p-2.5 bg-white/90 backdrop-blur-sm rounded-full text-black hover:bg-[#00C853] hover:text-white transition-all duration-300 shadow-lg"
+              className="p-3 bg-white text-black rounded-full hover:bg-[#00C853] hover:text-white transition-all duration-300 shadow-lg"
+              title="Live Demo"
             >
-              <ArrowUpRight size={16} strokeWidth={2} />
+              <ArrowUpRight size={18} strokeWidth={2.5} />
             </a>
           )}
         </div>
       </div>
 
-      {/* Project Details */}
-      <div className="space-y-3 px-1">
+      {/* Project Meta Data */}
+      <div className="flex flex-col gap-3 px-2">
         <div className="flex justify-between items-start">
-          <h3
-            className={`font-medium text-black tracking-tight group-hover:text-[#00C853] transition-colors duration-300 ${
-              index < 2 ? "text-2xl" : "text-xl"
-            }`}
-          >
-            {project.title}
-          </h3>
-          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1.5">
-            {project.category}
-          </span>
+          <div className="space-y-1">
+            <h3
+              className={`font-semibold text-neutral-900 tracking-tight leading-none group-hover:text-[#00C853] transition-colors duration-300 ${
+                index < 2 ? "text-3xl" : "text-2xl"
+              }`}
+            >
+              {project.title}
+            </h3>
+            <span className="block text-[11px] font-bold text-neutral-400 uppercase tracking-widest">
+              {project.category}
+            </span>
+          </div>
         </div>
 
-        <p className="text-gray-600 text-sm leading-relaxed line-clamp-2 font-light">
+        <p className="text-neutral-600 text-sm leading-relaxed line-clamp-2 font-medium max-w-[90%]">
           {project.description}
         </p>
 
-        <div className="flex flex-wrap gap-2 pt-1">
+        {/* Tech Stack Pills */}
+        <div className="flex flex-wrap gap-2 pt-2">
           {Array.isArray(project.techStack) &&
-            project.techStack.slice(0, 3).map((tech: string) => (
+            project.techStack.slice(0, 4).map((tech: string) => (
               <span
                 key={tech}
-                className="px-2 py-1 text-[10px] font-semibold text-gray-500 bg-gray-100 rounded-md uppercase tracking-wide group-hover:bg-black group-hover:text-white transition-colors duration-300"
+                className="px-3 py-1 text-[11px] font-semibold text-neutral-600 border border-neutral-200 bg-white rounded-full uppercase tracking-wider transition-all duration-300 group-hover:border-black group-hover:bg-black group-hover:text-white"
               >
                 {tech}
               </span>
@@ -144,7 +160,6 @@ export default function ProjectsSection() {
       .then((data) => {
         const fetchedProjects = data || [];
 
-        // 1. DEFINE: Wolf Project
         const wolfProject = {
           id: "wolf-3d-clone",
           title: "3D Wolf Experience",
@@ -163,7 +178,6 @@ export default function ProjectsSection() {
             "https://wolf3d-5uz8h9joj-premdeshmane-01s-projects.vercel.app/",
         };
 
-        // 2. FIND & UPDATE: The "Sundown" Project
         let cloneProject = fetchedProjects.find(
           (p: any) =>
             p.title.toLowerCase().includes("sundown") ||
@@ -173,9 +187,8 @@ export default function ProjectsSection() {
         if (cloneProject) {
           cloneProject = {
             ...cloneProject,
-            // Override images with your local files:
             images: [
-              "/projects/sundown-1.png", 
+              "/projects/sundown-1.png",
               "/projects/sundown-2.png",
               "/projects/sundown-3.png",
               "/projects/sundown-4.png",
@@ -183,7 +196,6 @@ export default function ProjectsSection() {
           };
         }
 
-        // 3. FILTER
         const otherProjects = fetchedProjects.filter(
           (p: any) =>
             p.id !== "wolf-3d-clone" &&
@@ -191,7 +203,6 @@ export default function ProjectsSection() {
             p.id !== cloneProject?.id
         );
 
-        // 4. COMBINE
         setProjects(
           [wolfProject, cloneProject, ...otherProjects].filter(Boolean)
         );
@@ -203,53 +214,75 @@ export default function ProjectsSection() {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: { staggerChildren: 0.15, delayChildren: 0.2 },
+      transition: { staggerChildren: 0.1, delayChildren: 0.2 },
     },
   };
 
   const cardVariants: Variants = {
-    hidden: { opacity: 0, y: 30, scale: 0.98 },
+    hidden: { opacity: 0, y: 40, scale: 0.95, filter: "blur(10px)" },
     visible: {
       opacity: 1,
       y: 0,
       scale: 1,
-      transition: { duration: 0.8, ease: [0.2, 0.65, 0.3, 0.9] },
+      filter: "blur(0px)",
+      transition: {
+        type: "spring",
+        stiffness: 50,
+        damping: 20,
+        duration: 0.8,
+      },
     },
   };
 
   return (
     <section
       id="projects"
-      className="py-12 md:pt-24 md:pb-12 px-4 md:px-6 relative z-20 bg-[#DEDEDE]"
+      className="relative py-20 md:py-32 px-4 md:px-6 bg-[#DEDEDE] overflow-hidden"
     >
-      <div className="max-w-7xl mx-auto">
+      {/* Background Texture */}
+      <NoiseBackground />
+
+      <div className="max-w-7xl mx-auto relative z-10">
+        {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-50px" }}
-          transition={{ duration: 0.8 }}
-          className="flex flex-col md:flex-row justify-between items-end mb-8 md:mb-20 border-b border-black/5 pb-6 md:pb-10"
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="flex flex-col md:flex-row justify-between items-end mb-16 md:mb-24 border-b border-black/10 pb-8"
         >
-          <div className="space-y-2 md:space-y-4">
-            <div className="inline-flex items-center gap-2 px-2 py-1 rounded border border-black/5 bg-white/50 backdrop-blur-sm">
-              <Layers size={10} className="text-emerald-600" />
-              <span className="text-[10px] font-bold tracking-[0.2em] text-gray-500 uppercase">
+          <div className="space-y-6">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-neutral-300 bg-white/40 backdrop-blur-sm shadow-sm">
+              <Layers size={12} className="text-emerald-600" />
+              <span className="text-[10px] font-bold tracking-[0.2em] text-neutral-600 uppercase">
                 Selected Works
               </span>
             </div>
-            <h2 className="text-3xl md:text-5xl lg:text-7xl font-medium text-black tracking-tight leading-tight">
-              Curated{" "}
-              <span className="text-gray-400 font-light italic">Excellence</span>
+            
+            <h2 className="text-4xl md:text-6xl lg:text-7xl font-semibold text-neutral-900 tracking-tighter leading-[0.9]">
+              Curated <br className="hidden md:block" />
+              <span className="relative inline-block">
+                Excellence
+                <Sparkles
+                  className="absolute -top-6 -right-8 text-[#00C853] opacity-50"
+                  size={32}
+                  strokeWidth={1}
+                />
+              </span>
             </h2>
           </div>
 
-          <p className="text-gray-600 max-w-xs text-left md:text-right text-xs md:text-sm font-medium leading-relaxed mt-4 md:mt-0">
-            Digital experiences crafted with pixel-perfect precision and
-            engineering depth.
-          </p>
+          <div className="mt-6 md:mt-0 flex flex-col items-start md:items-end gap-2">
+            <p className="text-neutral-600 max-w-sm text-left md:text-right text-sm md:text-base font-medium leading-relaxed">
+              Digital experiences crafted with pixel-perfect precision and
+              engineering depth.
+            </p>
+            <div className="h-1 w-20 bg-[#00C853] rounded-full opacity-80" />
+          </div>
         </motion.div>
 
-        <div className="md:hidden flex flex-col gap-8 pb-8">
+        {/* Mobile View (Stack) */}
+        <div className="md:hidden flex flex-col gap-12 pb-12">
           {projects.map((project, index) => (
             <ProjectCard
               key={project.id || index}
@@ -260,12 +293,13 @@ export default function ProjectsSection() {
           ))}
         </div>
 
+        {/* Desktop View (Bento Grid) */}
         <motion.div
-          className="hidden md:grid grid-cols-1 md:grid-cols-6 gap-x-8 gap-y-16"
+          className="hidden md:grid grid-cols-1 md:grid-cols-6 gap-x-10 gap-y-20"
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: "-50px" }}
+          viewport={{ once: true, margin: "-100px" }}
         >
           {projects.map((project: any, index: number) => (
             <ProjectCard
