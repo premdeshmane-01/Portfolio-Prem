@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MapPin, Linkedin, Github, Check, Copy, ArrowRight } from "lucide-react";
+import { Turnstile } from "@marsidev/react-turnstile";
 
 type FormState = {
   name: string;
@@ -11,7 +12,14 @@ type FormState = {
   company: string; // honeypot
 };
 
-type FormErrors = Partial<Omit<FormState, "company">>;
+// FIXED: Explicit type definition prevents intersection errors
+type FormErrors = {
+  name?: string;
+  email?: string;
+  message?: string;
+  token?: string;
+};
+
 type StatusState = { ok: boolean; msg: string } | null;
 
 export default function ContactSection() {
@@ -21,6 +29,9 @@ export default function ContactSection() {
     message: "",
     company: "",
   });
+
+  const [token, setToken] = useState<string>("");
+  const turnstileRef = useRef<any>(null);
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [loading, setLoading] = useState(false);
@@ -33,17 +44,23 @@ export default function ContactSection() {
     if (!form.email.trim()) e.email = "Email is required";
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) e.email = "Invalid email address";
     if (!form.message.trim()) e.message = "Message is required";
-    
+    if (!token) e.token = "Please complete the verification check";
+
     setErrors(e);
     return Object.keys(e).length === 0;
   };
 
+  // FIXED: Handle change logic with correct casting
   const handleChange = (field: keyof FormState) => (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     setForm((s) => ({ ...s, [field]: e.target.value }));
+    
     if (field !== "company") {
-       setErrors((prev) => ({ ...prev, [field as keyof FormErrors]: undefined }));
+       setErrors((prev) => ({ 
+         ...prev, 
+         [field as keyof FormErrors]: undefined 
+       }));
     }
     setStatus(null);
   };
@@ -52,7 +69,6 @@ export default function ContactSection() {
     if (!validate()) return;
     setLoading(true);
     
-    // Simulate API call
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
@@ -62,17 +78,23 @@ export default function ContactSection() {
           email: form.email,
           message: form.message,
           company: form.company,
+          token: token,
           timestamp: new Date().toISOString(),
         }),
       });
 
-      if (!res.ok) throw new Error("Failed");
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.error || "Failed");
 
       setForm({ name: "", email: "", message: "", company: "" });
+      setToken("");
+      turnstileRef.current?.reset();
+      
       setStatus({ ok: true, msg: "Message sent! I'll be in touch." });
       setTimeout(() => setStatus(null), 5000);
-    } catch {
-      setStatus({ ok: false, msg: "Something went wrong." });
+    } catch (err: any) {
+      setStatus({ ok: false, msg: err.message || "Something went wrong." });
     } finally {
       setLoading(false);
     }
@@ -89,17 +111,13 @@ export default function ContactSection() {
       id="contact" 
       className="relative z-10 bg-[#DEDEDE] py-12 md:py-20 px-4 md:px-6 overflow-hidden"
     >
-      
-      {/* Subtle Background Elements */}
       <div className="absolute inset-0 pointer-events-none">
          <div className="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] bg-white/40 rounded-full blur-[100px]" />
       </div>
 
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-start">
-          
-          {/* ================= LEFT COLUMN: INFO ================= */}
-          {/* CHANGED: Added 'hidden lg:block' to hide this entire column on mobile/tablet */}
+        
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -107,8 +125,7 @@ export default function ContactSection() {
             transition={{ duration: 0.6 }}
             className="hidden lg:block space-y-10"
           >
-            <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/60 border border-black/5 backdrop-blur-md mb-6 shadow-sm">
+             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/60 border border-black/5 backdrop-blur-md mb-6 shadow-sm">
                 <span className="relative flex h-2 w-2">
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75" />
                   <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-600" />
@@ -127,50 +144,44 @@ export default function ContactSection() {
                 I’m currently looking for <span className="font-semibold text-black">internships</span> and <span className="font-semibold text-black">collaborations</span>. 
                 Whether you have a question or just want to say hi, I'll try my best to get back to you!
               </p>
-            </div>
 
-            {/* Quick Contact Info */}
-            <div className="space-y-10">
-               
-               {/* Click to Copy Email */}
+              <div className="space-y-10">
                <div className="group">
-                 <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2 ml-1">Email</p>
-                 <button 
-                   type="button" 
-                   onClick={copyEmail}
-                   className="flex items-center gap-4 text-xl md:text-2xl font-medium text-black hover:text-emerald-600 transition-colors text-left"
-                 >
-                   premdeshmane01@gmail.com
-                   
-                   <div className="relative w-9 h-9 flex items-center justify-center">
-                      <AnimatePresence mode='wait'>
-                        {emailCopied ? (
-                          <motion.div 
-                            key="check"
-                            initial={{ scale: 0, opacity: 0 }} 
-                            animate={{ scale: 1, opacity: 1 }} 
-                            exit={{ scale: 0, opacity: 0 }}
-                            className="absolute inset-0 flex items-center justify-center p-2 bg-emerald-100 text-emerald-600 rounded-full"
-                          >
-                            <Check size={16} />
-                          </motion.div>
-                        ) : (
-                          <motion.div 
-                            key="copy"
-                            initial={{ scale: 0, opacity: 0 }} 
-                            animate={{ scale: 1, opacity: 1 }} 
-                            exit={{ scale: 0, opacity: 0 }}
-                            className="absolute inset-0 flex items-center justify-center p-2 bg-gray-100 text-gray-500 rounded-full group-hover:bg-black group-hover:text-white transition-colors"
-                          >
-                            <Copy size={16} />
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                   </div>
-                 </button>
+                  <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2 ml-1">Email</p>
+                  <button 
+                    type="button" 
+                    onClick={copyEmail}
+                    className="flex items-center gap-4 text-xl md:text-2xl font-medium text-black hover:text-emerald-600 transition-colors text-left"
+                  >
+                    premdeshmane01@gmail.com
+                    <div className="relative w-9 h-9 flex items-center justify-center">
+                       <AnimatePresence mode='wait'>
+                         {emailCopied ? (
+                           <motion.div 
+                             key="check"
+                             initial={{ scale: 0, opacity: 0 }} 
+                             animate={{ scale: 1, opacity: 1 }} 
+                             exit={{ scale: 0, opacity: 0 }}
+                             className="absolute inset-0 flex items-center justify-center p-2 bg-emerald-100 text-emerald-600 rounded-full"
+                           >
+                             <Check size={16} />
+                           </motion.div>
+                         ) : (
+                           <motion.div 
+                             key="copy"
+                             initial={{ scale: 0, opacity: 0 }} 
+                             animate={{ scale: 1, opacity: 1 }} 
+                             exit={{ scale: 0, opacity: 0 }}
+                             className="absolute inset-0 flex items-center justify-center p-2 bg-gray-100 text-gray-500 rounded-full group-hover:bg-black group-hover:text-white transition-colors"
+                           >
+                             <Copy size={16} />
+                           </motion.div>
+                         )}
+                       </AnimatePresence>
+                    </div>
+                  </button>
                </div>
                
-               {/* Location */}
                <div>
                  <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2 ml-1">Location</p>
                  <div className="flex items-center gap-3">
@@ -181,7 +192,6 @@ export default function ContactSection() {
                  </div>
                </div>
 
-               {/* Socials */}
                <div>
                  <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3 ml-1">Socials</p>
                  <div className="flex gap-3">
@@ -189,10 +199,9 @@ export default function ContactSection() {
                     <SocialBtn href="https://github.com/premdeshmane-01" icon={Github} />
                  </div>
                </div>
-            </div>
+             </div>
           </motion.div>
 
-          {/* ================= RIGHT COLUMN: FORM (Always Visible) ================= */}
           <motion.div 
              initial={{ opacity: 0, y: 30 }}
              whileInView={{ opacity: 1, y: 0 }}
@@ -200,7 +209,6 @@ export default function ContactSection() {
              transition={{ duration: 0.6, delay: 0.2 }}
              className="bg-white rounded-3xl p-6 md:p-10 shadow-xl shadow-black/[0.03] border border-black/5"
           >
-             {/* Simple Header for Mobile Only since left column is hidden */}
              <div className="lg:hidden mb-6 text-center">
                 <h2 className="text-2xl font-bold text-black mb-2">Get in touch</h2>
                 <p className="text-sm text-gray-500">Drop a message and I'll get back to you.</p>
@@ -243,6 +251,22 @@ export default function ContactSection() {
                     placeholder="Tell me about your project..."
                   />
                   {errors.message && <p className="text-[10px] text-red-500 ml-1 font-medium">{errors.message}</p>}
+                </div>
+
+                {/* TURNSTILE WIDGET */}
+                <div className="w-full overflow-hidden">
+                    <Turnstile 
+                        ref={turnstileRef}
+                        siteKey={process.env.NEXT_PUBLIC_CLOUDFLARE_SITE_KEY || ""}
+                        onSuccess={(token) => {
+                            setToken(token);
+                            setErrors((prev) => ({ ...prev, token: undefined }));
+                        }}
+                        onError={() => setErrors((prev) => ({ ...prev, token: "Verification failed" }))}
+                        onExpire={() => setToken("")}
+                        className="w-full"
+                    />
+                    {errors.token && <p className="text-[10px] text-red-500 ml-1 font-medium mt-1">{errors.token}</p>}
                 </div>
 
                 <button 
