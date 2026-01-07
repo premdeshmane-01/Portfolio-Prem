@@ -256,16 +256,16 @@ export default function ContactSection() {
                 {/* TURNSTILE WIDGET */}
                 <div className="w-full overflow-hidden">
                     <Turnstile 
-                        ref={turnstileRef}
-                        siteKey={process.env.NEXT_PUBLIC_CLOUDFLARE_SITE_KEY || ""}
-                        onSuccess={(token) => {
-                            setToken(token);
-                            setErrors((prev) => ({ ...prev, token: undefined }));
-                        }}
-                        onError={() => setErrors((prev) => ({ ...prev, token: "Verification failed" }))}
-                        onExpire={() => setToken("")}
-                        className="w-full"
-                    />
+    ref={turnstileRef}
+    siteKey="0x4AAAAAACLDwTRzqVE3p6EA"  // <--- PASTE YOUR ACTUAL KEY HERE
+    onSuccess={(token) => {
+        setToken(token);
+        setErrors((prev) => ({ ...prev, token: undefined }));
+    }}
+    onError={() => setErrors((prev) => ({ ...prev, token: "Verification failed" }))}
+    onExpire={() => setToken("")}
+    className="w-full"
+/>
                     {errors.token && <p className="text-[10px] text-red-500 ml-1 font-medium mt-1">{errors.token}</p>}
                 </div>
 
