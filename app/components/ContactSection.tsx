@@ -257,7 +257,7 @@ export default function ContactSection() {
                 <div className="w-full overflow-hidden">
                     <Turnstile 
     ref={turnstileRef}
-    siteKey={process.env.NEXT_PUBLIC_CLOUDFLARE_SITE_KEY || ""}  // <--- PASTE YOUR ACTUAL KEY HERE
+    siteKey="0x4AAAAAACLDwTRzqVE3p6EA"  // <--- PASTE YOUR ACTUAL KEY HERE
     onSuccess={(token) => {
         setToken(token);
         setErrors((prev) => ({ ...prev, token: undefined }));
