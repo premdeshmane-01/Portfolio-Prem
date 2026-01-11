@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 
+// 1. Import the ChatWidget here
+import ChatWidget from "./components/ChatWidget"; 
+
 const inter = Inter({ subsets: ["latin"] });
 
 const SITE_URL = "https://your-project-name.vercel.app";
@@ -10,7 +13,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
 
   title: {
-    default: "Premsagar Deshmane ",
+    default: "Premsagar Deshmane",
     template: "%s | Premsagar Deshmane",
   },
 
@@ -74,6 +77,9 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className} suppressHydrationWarning>
         {children}
+
+        {/* 2. Add the Widget here so it appears on all pages */}
+        <ChatWidget />
 
         {/* Structured Data: Personal Identity */}
         <script
