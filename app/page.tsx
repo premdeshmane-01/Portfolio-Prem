@@ -14,6 +14,18 @@ export default function Home() {
     // Added 'bg-[#0a0a0a]' here. This ensures that if there is a 1px gap during
     // rapid scrolling on mobile, it shows the background color instead of a white line.
     <main className="min-h-screen relative text-black bg-[#0a0a0a] selection:bg-[#00C853] selection:text-white overflow-x-hidden">
+      
+      {/* --- SEO KEYWORD BLOCK (Visible to Bots/Screen Readers, Hidden from Visual Layout) --- */}
+      {/* This forces Google to rank you for these specific job titles */}
+      <h1 className="sr-only">
+        Premsagar Deshmane - Frontend Engineer, Data Scientist, and AI Engineer Portfolio
+      </h1>
+      <p className="sr-only">
+        I am a Machine Learning Engineer and Full Stack Developer specializing in AI, MERN Stack, and Data Science.
+        Based in India, I build high-performance web systems and RAG pipelines.
+      </p>
+      {/* ------------------------------------------------------------------------------------ */}
+
       <Preloader />
 
       <Navbar />
@@ -36,7 +48,7 @@ export default function Home() {
 
           {/* Bottom text inside content */}
           <div className="h-16 flex items-center justify-center text-gray-400 text-sm uppercase tracking-widest bg-[#DEDEDE]">
-            © 2025 Premsagar Deshmane
+            © 2025 Premsagar Deshmane | Data Scientist & Frontend Engineer
           </div>
 
           {/* Footer at the very bottom (normal flow) */}

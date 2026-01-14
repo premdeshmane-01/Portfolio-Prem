@@ -1,24 +1,16 @@
-import type { MetadataRoute } from "next";
+import { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://portfolio-prem-4m65.vercel.app/";
+  // 1. Remove the trailing slash from baseUrl to avoid double slashes later
+  const baseUrl = "https://portfolio-prem-4m65.vercel.app";
 
   return [
     {
-      url: `${baseUrl}/`,
+      url: baseUrl, // This is your Home Page
       lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 1,
     },
-    {
-      url: `${baseUrl}/#about`,
-      lastModified: new Date(),
-    },
-    {
-      url: `${baseUrl}/#projects`,
-      lastModified: new Date(),
-    },
-    {
-      url: `${baseUrl}/#contact`,
-      lastModified: new Date(),
-    },
+    // Only add more entries here if you create REAL new files like app/projects/page.tsx
   ];
 }

@@ -7,27 +7,32 @@ import ChatWidget from "./components/ChatWidget";
 
 const inter = Inter({ subsets: ["latin"] });
 
-const SITE_URL = "https://your-project-name.vercel.app";
+const SITE_URL = "https://portfolio-prem-4m65.vercel.app";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
 
-  title: {
-    default: "Premsagar Deshmane",
+title: {
+    default: "Prem Deshmane",
     template: "%s | Premsagar Deshmane",
   },
 
   description:
-    "Official portfolio of Premsagar Deshmane, a Computer Engineering student and Frontend & AI Engineer building reliable, performance-focused, and well-designed web systems.",
+    "Portfolio of Premsagar Deshmane (Prem), a Frontend Engineer and Data Scientist specializing in AI, Machine Learning, and MERN Stack development.",
 
-  keywords: [
+keywords: [
     "Premsagar Deshmane",
-    "Premsagar Deshmane Portfolio",
+    "Prem Deshmane",
+    "Prem Portfolio",
+    "Deshmane Portfolio",
     "Frontend Engineer",
     "AI Engineer",
+    "Machine Learning Engineer",
+    "Data Scientist",
+    "MERN Stack Developer",
+    "React Developer India",
     "Next.js Developer",
-    "React Developer",
-    "Computer Engineering Student",
+    "Software Engineer Portfolio"
   ],
 
   authors: [{ name: "Premsagar Deshmane" }],
@@ -39,8 +44,8 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     url: SITE_URL,
-    siteName: "Premsagar Deshmane",
-    title: "Premsagar Deshmane | Frontend & AI Engineer",
+    siteName: "Prem Deshmane",
+    title: "Premsagar Deshmane | Frontend & Data Scientist ",
     description:
       "Portfolio of Premsagar Deshmane — frontend engineering, AI systems, and modern web architecture.",
     images: [
