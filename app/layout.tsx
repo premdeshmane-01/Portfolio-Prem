@@ -33,9 +33,8 @@ export const metadata: Metadata = {
   authors: [{ name: "Premsagar Deshmane" }],
   creator: "Premsagar Deshmane",
 
-  icons: {
-    icon: "/profile.png",
-  },
+  // ❌ DELETED: The 'icons' section is removed.
+  // Next.js will now automatically look for 'icon.png' in your app/ folder.
 
   openGraph: {
     type: "website",
