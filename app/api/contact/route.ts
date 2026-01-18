@@ -5,9 +5,16 @@ export async function POST(req: Request) {
   try {
     const { name, email, message, company, timestamp, token } = await req.json();
 
-    // 1. Honeypot check (bot detected via hidden field)
+    // --- DEBUGGING LOGS (Check your VS Code Terminal when you click Send) ---
+    console.log("--- CONTACT API DEBUG START ---");
+    console.log("1. Email User exists:", !!process.env.EMAIL_USER);
+    console.log("2. Secret Key exists:", !!process.env.CLOUDFLARE_SECRET_KEY);
+    console.log("3. Secret Key Value (First 5 chars):", process.env.CLOUDFLARE_SECRET_KEY?.substring(0, 5));
+    console.log("---------------------------------");
+    // -----------------------------------------------------------------------
+
+    // 1. Honeypot check
     if (company) {
-      // Return fake success so bots don't know they failed
       return NextResponse.json({ success: true });
     }
 
@@ -15,16 +22,18 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    // 2. CLOUDFLARE TURNSTILE VERIFICATION
-    if (!token) {
-      return NextResponse.json({ error: "Captcha verification missing" }, { status: 400 });
-    }
-
+    // 2. CHECK ENV VAR
     const secretKey = process.env.CLOUDFLARE_SECRET_KEY;
 
     if (!secretKey) {
-        console.error("ERROR: Missing CLOUDFLARE_SECRET_KEY in .env file");
+        // THIS IS THE ERROR YOU ARE SEEING
+        console.error("CRITICAL ERROR: CLOUDFLARE_SECRET_KEY is undefined in process.env");
         return NextResponse.json({ error: "Server configuration error" }, { status: 500 });
+    }
+
+    // 3. CLOUDFLARE VERIFICATION
+    if (!token) {
+      return NextResponse.json({ error: "Captcha verification missing" }, { status: 400 });
     }
 
     const verifyUrl = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
@@ -32,8 +41,6 @@ export async function POST(req: Request) {
     const formData = new FormData();
     formData.append("secret", secretKey);
     formData.append("response", token);
-    // Optional: Pass the user's IP if available, but often hard in serverless/edge
-    // formData.append("remoteip", ip); 
 
     const turnstileRes = await fetch(verifyUrl, {
       method: "POST",
@@ -50,7 +57,7 @@ export async function POST(req: Request) {
       );
     }
 
-    // 3. Send Email (Only if captcha passes)
+    // 4. Send Email
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -64,18 +71,7 @@ export async function POST(req: Request) {
       to: process.env.EMAIL_TO,
       replyTo: email,
       subject: `New Contact Message from ${name}`,
-      text: `
---------------------------------------------------
-NEW PORTFOLIO INQUIRY
---------------------------------------------------
-Name: ${name}
-Email: ${email}
-Time: ${timestamp}
-
-Message:
-${message}
---------------------------------------------------
-      `,
+      text: `Name: ${name}\nEmail: ${email}\nMessage: ${message}`,
     });
 
     return NextResponse.json({ success: true });
@@ -83,7 +79,7 @@ ${message}
   } catch (err) {
     console.error("Contact API error:", err);
     return NextResponse.json(
-      { error: "Failed to send message. Please try again later." },
+      { error: "Failed to send message." },
       { status: 500 }
     );
   }
