@@ -12,7 +12,6 @@ type FormState = {
   company: string; // honeypot
 };
 
-// FIXED: Explicit type definition prevents intersection errors
 type FormErrors = {
   name?: string;
   email?: string;
@@ -50,7 +49,6 @@ export default function ContactSection() {
     return Object.keys(e).length === 0;
   };
 
-  // FIXED: Handle change logic with correct casting
   const handleChange = (field: keyof FormState) => (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -112,7 +110,7 @@ export default function ContactSection() {
       className="relative z-10 bg-[#DEDEDE] py-12 md:py-20 px-4 md:px-6 overflow-hidden"
     >
       <div className="absolute inset-0 pointer-events-none">
-         <div className="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] bg-white/40 rounded-full blur-[100px]" />
+          <div className="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] bg-white/40 rounded-full blur-[100px]" />
       </div>
 
       <div className="max-w-7xl mx-auto relative z-10">
@@ -125,7 +123,7 @@ export default function ContactSection() {
             transition={{ duration: 0.6 }}
             className="hidden lg:block space-y-10"
           >
-             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/60 border border-black/5 backdrop-blur-md mb-6 shadow-sm">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/60 border border-black/5 backdrop-blur-md mb-6 shadow-sm">
                 <span className="relative flex h-2 w-2">
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75" />
                   <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-600" />
@@ -155,29 +153,29 @@ export default function ContactSection() {
                   >
                     premdeshmane01@gmail.com
                     <div className="relative w-9 h-9 flex items-center justify-center">
-                       <AnimatePresence mode='wait'>
-                         {emailCopied ? (
-                           <motion.div 
-                             key="check"
-                             initial={{ scale: 0, opacity: 0 }} 
-                             animate={{ scale: 1, opacity: 1 }} 
-                             exit={{ scale: 0, opacity: 0 }}
-                             className="absolute inset-0 flex items-center justify-center p-2 bg-emerald-100 text-emerald-600 rounded-full"
-                           >
-                             <Check size={16} />
-                           </motion.div>
-                         ) : (
-                           <motion.div 
-                             key="copy"
-                             initial={{ scale: 0, opacity: 0 }} 
-                             animate={{ scale: 1, opacity: 1 }} 
-                             exit={{ scale: 0, opacity: 0 }}
-                             className="absolute inset-0 flex items-center justify-center p-2 bg-gray-100 text-gray-500 rounded-full group-hover:bg-black group-hover:text-white transition-colors"
-                           >
-                             <Copy size={16} />
-                           </motion.div>
-                         )}
-                       </AnimatePresence>
+                        <AnimatePresence mode='wait'>
+                          {emailCopied ? (
+                            <motion.div 
+                              key="check"
+                              initial={{ scale: 0, opacity: 0 }} 
+                              animate={{ scale: 1, opacity: 1 }} 
+                              exit={{ scale: 0, opacity: 0 }}
+                              className="absolute inset-0 flex items-center justify-center p-2 bg-emerald-100 text-emerald-600 rounded-full"
+                            >
+                              <Check size={16} />
+                            </motion.div>
+                          ) : (
+                            <motion.div 
+                              key="copy"
+                              initial={{ scale: 0, opacity: 0 }} 
+                              animate={{ scale: 1, opacity: 1 }} 
+                              exit={{ scale: 0, opacity: 0 }}
+                              className="absolute inset-0 flex items-center justify-center p-2 bg-gray-100 text-gray-500 rounded-full group-hover:bg-black group-hover:text-white transition-colors"
+                            >
+                              <Copy size={16} />
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
                     </div>
                   </button>
                </div>
@@ -199,7 +197,7 @@ export default function ContactSection() {
                     <SocialBtn href="https://github.com/premdeshmane-01" icon={Github} />
                  </div>
                </div>
-             </div>
+              </div>
           </motion.div>
 
           <motion.div 
@@ -253,19 +251,19 @@ export default function ContactSection() {
                   {errors.message && <p className="text-[10px] text-red-500 ml-1 font-medium">{errors.message}</p>}
                 </div>
 
-                {/* TURNSTILE WIDGET */}
+                {/* TURNSTILE WIDGET UPDATED */}
                 <div className="w-full overflow-hidden">
                     <Turnstile 
-    ref={turnstileRef}
-    siteKey="0x4AAAAAACLDwTRzqVE3p6EA"  // <--- PASTE YOUR ACTUAL KEY HERE
-    onSuccess={(token) => {
-        setToken(token);
-        setErrors((prev) => ({ ...prev, token: undefined }));
-    }}
-    onError={() => setErrors((prev) => ({ ...prev, token: "Verification failed" }))}
-    onExpire={() => setToken("")}
-    className="w-full"
-/>
+                       ref={turnstileRef}
+                       siteKey={process.env.NEXT_PUBLIC_CLOUDFLARE_SITE_KEY || ""} // 👈 This links to your .env file
+                       onSuccess={(token) => {
+                           setToken(token);
+                           setErrors((prev) => ({ ...prev, token: undefined }));
+                       }}
+                       onError={() => setErrors((prev) => ({ ...prev, token: "Verification failed" }))}
+                       onExpire={() => setToken("")}
+                       className="w-full"
+                    />
                     {errors.token && <p className="text-[10px] text-red-500 ml-1 font-medium mt-1">{errors.token}</p>}
                 </div>
 
